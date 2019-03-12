@@ -1,5 +1,5 @@
 class Log {
-    
+
     private static enable: boolean = true;
 
     public static setEnable(enable: boolean): void {
@@ -28,5 +28,10 @@ class Log {
     public static w(str: string) {
         if (!this.isEnable()) return;
         console.log("Warning: ", str);
+    }
+
+    public static o(object: any) {
+        if (!this.isEnable()) return;
+        console.log(object);
     }
 }

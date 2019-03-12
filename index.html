@@ -3,9 +3,20 @@
 
 <head>
     <title>Exercise 2 - LiamPham</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <script src="./Utils.js"></script>
-    <script src="./Logger.js"></script>
+    <script src="./dist/base/ESwitch.js"></script>
+    <script src="./dist/base/Logger.js"></script>
+    <script src="./dist/base/ParamsKey.js"></script>
+    <script src="./dist/base/Point.js"></script>
+    <script src="./dist/base/Utils.js"></script>
+    <script src="./dist/base/Size.js"></script>
+    <script src="./dist/electric/AElectricComponent.js"></script>
+    <script src="./dist/electric/CommonElectricComponent.js"></script>
+    <script src="./dist/electric/ElectricBoard.js"></script>
+    <script src="./dist/electric/BoardUIController.js"></script>
+
     <link rel="stylesheet" href="./assets/css/style.css">
     <link rel="stylesheet" href="./assets/css/animate.css">
     <link rel="stylesheet" href="./assets/css/common.css">
@@ -13,19 +24,174 @@
 
 <body>
 
-    <h1>"Test electric board" Web component.</h1>
+    <div class="a1-container-absolute">
+        <div class="a1-container a3-container">
+            <div class="a3-flex-1 a1-height-100" style="overflow: auto; max-height: 100vh;">
+                <div class="a1-padding">
+                    <h1>"Test electric board" Web component.</h1>
+
+                    <div class="a1-padding a1-text-center">
+                        <div class="a1-text-center">
+                            <h3>Electric Board</h3>
+                        </div>
+                        <div id="board_container_id"
+                            style="display: inline-block; width : 480px; height: 480px; position: relative; border: solid 1px black; overflow: hidden;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                style="width:25%; max-width: 400px; min-width: 200px; height:100%; overflow: auto; background-color: #F2F2F2">
+                <div class="a1-padding">
+                    <h2>Board Properties</h2>
+                    <div class="a3-container a3-items-center a3-justify-between">
+                        <div>Power Status</div>
+                        <label class="switch">
+                            <input id="input_board_power_switch" type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                        <div>Display Component Name</div>
+                        <label class="switch">
+                            <input id="input_board_display_component_name" type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                        <div>Grid Row</div>
+                        <input id="input_board_grid_row" type="number" class="user_input" value="6" min="1">
+                    </div>
+
+                    <div class="a3-container a3-items-center a3-justify-between  a1-margin-top">
+                        <div>Grid Column</div>
+                        <input id="input_board_grid_column" type="number" class="user_input" value="6" min="1">
+                    </div>
+
+                    <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                        <div>Background Color</div>
+                        <input id="input_board_background_color" type="color" class="user_color_input" value="#eeffed">
+                    </div>
+
+                    <div class="a1-padding a1-text-center">
+                        <button id="btn_apply_board_configuration" class="primary_button">Apply</button>
+                    </div>
+
+                    <hr>
+
+                    <div id="list_components_container">
+
+                    </div>
+                    <div id="component_detail_container">
+                        <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                            <h2 id="component_name">Add new component</h2>
+                            <button id="btn_close_component_detail" class="btn" style="width:32px; height: 32px"><i
+                                    class="fa fa-close"></i></button>
+                        </div>
+
+                        <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                            <div>Component Name</div>
+                            <input id="input_component_name" type="text" class="user_input">
+                        </div>
+
+                        <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                            <div>Power State</div>
+                            <label class="switch">
+                                <input id="input_component_power_state" type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                            <div>ForeColor</div>
+                            <input id="input_component_forecolor" type="color" class="user_color_input" value="#eeffed">
+                        </div>
+
+                        <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                            <div>Position X(px)</div>
+                            <input id="input_component_position_x" type="number" class="user_input" min="0" max="480">
+                        </div>
+
+                        <div class="a3-container a3-items-center a3-justify-between  a1-margin-top">
+                            <div>Position Y(px)</div>
+                            <input id="input_component_position_y" type="number" class="user_input" min="0" max="480">
+                        </div>
+
+                        <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
+                            <div>On Image</div>
+                            <input id="input_component_on_image" type="text" class="user_input">
+                        </div>
+
+                        <div class="a3-container a3-items-center a3-justify-between  a1-margin-top">
+                            <div>Off Image</div>
+                            <input id="input_component_off_image" type="text" class="user_input">
+                        </div>
+
+                        <div class="a1-padding a1-text-center">
+                            <button id="btn_add_component" class="primary_button">Add</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 
-    <h3>Board Configuration</h3>
 
-    
+
+    <!-- <div class="a1-container">
+        <div class="a1-absolute a1-left a1-top" name="component_name">Component Name</div>
+        <img src="" class="a1-content-center" name="img_on">
+        <img src="" class="a1-content-center" name="img_off">
+        <div name="custome_render"></div>
+    </div> -->
+
+
 
 
 </body>
 
 <script>
     window.onload = function () {
-    
+        var board = new ElectricBoard("board_container_id");
+        board.setConfig({
+            "grid_column": 6,
+            "grid_row": 6,
+            "power_switch_state": 1,
+            "display_component_name": 1,
+            "background_color": "#eeffed",
+            "electric_components": [
+                {
+                    "name": "TV",
+                    "position": {
+                        "x": 80,
+                        "y": 80
+                    },
+                    "on_image": "./assets/images/tv_on.png",
+                    "off_image": "./assets/images/tv_off.png",
+                    "switch_state": 0
+                },
+                {
+                    "name": "Lamp",
+                    "fore_color": "red",
+                    "position": {
+                        "x": 240,
+                        "y": 320
+                    },
+                    "on_image": "./assets/images/lamp_on.png",
+                    "off_image": "./assets/images/lamp_off.png",
+                    "switch_state": 1
+                }
+            ]
+        });
+        board.render();
+
+        var boarUIController = new BoardUIController(board);
+
     }
 </script>
 
