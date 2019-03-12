@@ -1,0 +1,12 @@
+{
+  "name": "equation-test",
+  "version": "1.0.0",
+  "description": "Example 1 of training session",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --rootDir .\/classes --outDir ."
+  },
+
+  "author": "liam.pham",
+  "license": "ISC"
+}
