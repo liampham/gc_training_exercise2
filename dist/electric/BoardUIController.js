@@ -73,10 +73,11 @@ var BoardUIController = /** @class */ (function () {
     BoardUIController.prototype.onClickAddNewComponent = function () {
         var _this = this;
         this.currentComponent = new CommonElectricComponent();
+        this.currentComponent.getPosition().set(240, 240);
         this.showComponentDetail(true);
-        document.getElementById("component_name").innerText = "Add new component";
-        document.getElementById("btn_submit_component").style.visibility = "visible";
-        document.getElementById("btn_submit_component").onclick = function () {
+        document.getElementById(R.COMPONENT_NAME).innerText = "Add new component";
+        document.getElementById(R.BTN_SUBMIT_COMPONENT).style.visibility = "visible";
+        document.getElementById(R.BTN_SUBMIT_COMPONENT).onclick = function () {
             if (Utils.isEmptyString(_this.currentComponent.getName()))
                 return;
             _this.electricBoard.pluggedInNewComponent(_this.currentComponent);
@@ -96,30 +97,30 @@ var BoardUIController = /** @class */ (function () {
         }
         if (!this.currentComponent)
             return;
-        document.getElementById("component_name").innerText = "Component Detail";
+        document.getElementById(R.COMPONENT_NAME).innerText = "Component Detail";
         {
-            var componentNameElement_1 = document.getElementById("input_component_name");
+            var componentNameElement_1 = document.getElementById(R.INPUT_COMPONENT_NAME);
             componentNameElement_1.value = this.currentComponent.getName();
             componentNameElement_1.onchange = function () {
                 _this.currentComponent.changeComponentName(componentNameElement_1.value);
             };
         }
         {
-            var componentPowerStateElement_1 = document.getElementById("input_component_power_state");
+            var componentPowerStateElement_1 = document.getElementById(R.INPUT_COMPONENT_POWER_STATE);
             componentPowerStateElement_1.checked = this.currentComponent.getPluggedInState() == ESwitch.ON ? true : false;
             componentPowerStateElement_1.onchange = function () {
                 _this.currentComponent.changePluggedInState(componentPowerStateElement_1.checked ? 1 : 0, _this.electricBoard.getPowerState());
             };
         }
         {
-            var componentForeColorElement_1 = document.getElementById("input_component_forecolor");
+            var componentForeColorElement_1 = document.getElementById(R.INPUT_COMPONENT_FORECOLOR);
             componentForeColorElement_1.value = this.currentComponent.getForeColor();
             componentForeColorElement_1.onchange = function () {
                 _this.currentComponent.changeComponentForeColor(componentForeColorElement_1.value);
             };
         }
         {
-            var componentOnImageElement_1 = document.getElementById("input_component_on_image");
+            var componentOnImageElement_1 = document.getElementById(R.INPUT_COMPONENT_ON_IMAGE);
             componentOnImageElement_1.value = this.currentComponent.getOnImage();
             componentOnImageElement_1.onchange = function () {
                 _this.currentComponent.setOnImage(componentOnImageElement_1.value);
@@ -127,7 +128,7 @@ var BoardUIController = /** @class */ (function () {
             };
         }
         {
-            var componentOffImageElement_1 = document.getElementById("input_component_off_image");
+            var componentOffImageElement_1 = document.getElementById(R.INPUT_COMPONENT_OFF_IMAGE);
             componentOffImageElement_1.value = this.currentComponent.getOffImage();
             componentOffImageElement_1.onchange = function () {
                 _this.currentComponent.setOffImage(componentOffImageElement_1.value);
@@ -135,7 +136,7 @@ var BoardUIController = /** @class */ (function () {
             };
         }
         {
-            var componentPositionXElement_1 = document.getElementById("input_component_position_x");
+            var componentPositionXElement_1 = document.getElementById(R.INPUT_COMPONENT_POSITION_X);
             componentPositionXElement_1.value = this.currentComponent.getPosition().getX() + "";
             componentPositionXElement_1.onchange = function () {
                 _this.currentComponent.getPosition().setX(parseInt(componentPositionXElement_1.value));
@@ -143,7 +144,7 @@ var BoardUIController = /** @class */ (function () {
             };
         }
         {
-            var componentPositionYElement_1 = document.getElementById("input_component_position_y");
+            var componentPositionYElement_1 = document.getElementById(R.INPUT_COMPONENT_POSITION_Y);
             componentPositionYElement_1.value = this.currentComponent.getPosition().getY() + "";
             componentPositionYElement_1.onchange = function () {
                 _this.currentComponent.getPosition().setY(parseInt(componentPositionYElement_1.value));
@@ -151,14 +152,14 @@ var BoardUIController = /** @class */ (function () {
             };
         }
         {
-            var customRenderComponent_1 = document.getElementById("input_custom_render");
+            var customRenderComponent_1 = document.getElementById(R.INPUT_CUSTOM_RENDER);
             customRenderComponent_1.value = this.currentComponent.getCustomRender();
             customRenderComponent_1.onchange = function () {
                 _this.currentComponent.setCustomRender(customRenderComponent_1.value.trim());
                 _this.currentComponent.onBoardPowerStateChanged(_this.electricBoard.getPowerState());
             };
         }
-        document.getElementById("btn_submit_component").style.visibility = "hidden";
+        document.getElementById(R.BTN_SUBMIT_COMPONENT).style.visibility = "hidden";
     };
     BoardUIController.prototype.updateBoardConfigurations = function () {
         var displayComponentName = document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);

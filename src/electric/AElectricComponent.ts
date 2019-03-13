@@ -80,7 +80,10 @@ abstract class AElectricComponent implements IElectricComponent {
             return;
         }
 
-
+        let customRenders = this.getView().getElementsByClassName("custom_render");
+        if (customRenders.length > 0) {
+            (<HTMLElement>customRenders[0]).innerHTML = "";
+        }
 
         var imgSrc = this.getOffImage();
 

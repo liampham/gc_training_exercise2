@@ -51,11 +51,15 @@ var AElectricComponent = /** @class */ (function () {
             if (imageEles_1.length > 0) {
                 imageEles_1[0].style.visibility = "hidden";
             }
-            var customRenders = this.getView().getElementsByClassName("custom_render");
-            if (customRenders.length > 0) {
-                customRenders[0].innerHTML = this.customRender;
+            var customRenders_1 = this.getView().getElementsByClassName("custom_render");
+            if (customRenders_1.length > 0) {
+                customRenders_1[0].innerHTML = this.customRender;
             }
             return;
+        }
+        var customRenders = this.getView().getElementsByClassName("custom_render");
+        if (customRenders.length > 0) {
+            customRenders[0].innerHTML = "";
         }
         var imgSrc = this.getOffImage();
         if (this.getPluggedInState() == ESwitch.ON && boardPluggedInState == ESwitch.ON) {

@@ -34,3 +34,5 @@ The electric component APIs should allow customer customize the way of render st
 					
 - Please focus on the design with OOP principles.			
 - Using TypeScript and no library references.							
+
+

@@ -12,5 +12,14 @@ class R {
    public static INPUT_BOARD_GRID_ROW: string = "input_board_grid_row";
    public static INPUT_BOARD_GRID_COLUMN: string = "input_board_grid_column";
    public static INPUT_BOARD_BACKGROUND_COLOR: string = "input_board_background_color";
+   public static COMPONENT_NAME: string = "component_name";
+   public static INPUT_CUSTOM_RENDER: string = "input_custom_render";
+   public static INPUT_COMPONENT_POSITION_X: string = "input_component_position_x";
+   public static INPUT_COMPONENT_POSITION_Y: string = "input_component_position_y";
+   public static INPUT_COMPONENT_ON_IMAGE: string = "input_component_on_image";
+   public static INPUT_COMPONENT_OFF_IMAGE: string = "input_component_off_image";
+   public static INPUT_COMPONENT_FORECOLOR: string = "input_component_forecolor";
+   public static INPUT_COMPONENT_POWER_STATE: string = "input_component_power_state";
+
 
 }

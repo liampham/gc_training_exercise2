@@ -92,11 +92,11 @@ class BoardUIController {
         this.currentComponent = new CommonElectricComponent();
         this.currentComponent.getPosition().set(240,240);
         this.showComponentDetail(true);
-        document.getElementById("component_name").innerText = "Add new component";
+        document.getElementById(R.COMPONENT_NAME).innerText = "Add new component";
 
-        (<HTMLElement>document.getElementById("btn_submit_component")).style.visibility = "visible";
+        (<HTMLElement>document.getElementById(R.BTN_SUBMIT_COMPONENT)).style.visibility = "visible";
 
-        (<HTMLElement>document.getElementById("btn_submit_component")).onclick = ()=>{
+        (<HTMLElement>document.getElementById(R.BTN_SUBMIT_COMPONENT)).onclick = ()=>{
             if(Utils.isEmptyString(this.currentComponent.getName())) return;
             this.electricBoard.pluggedInNewComponent(this.currentComponent);
             this.showComponentDetail(false);
@@ -111,10 +111,10 @@ class BoardUIController {
 
         if (!this.currentComponent) return;
 
-        document.getElementById("component_name").innerText = "Component Detail";
+        document.getElementById(R.COMPONENT_NAME).innerText = "Component Detail";
 
         {
-            let componentNameElement = <HTMLInputElement>document.getElementById("input_component_name");
+            let componentNameElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_NAME);
             componentNameElement.value = this.currentComponent.getName();
             componentNameElement.onchange = () => {
                 this.currentComponent.changeComponentName(componentNameElement.value);
@@ -122,7 +122,7 @@ class BoardUIController {
         }
 
         {
-            let componentPowerStateElement = (<HTMLInputElement>document.getElementById("input_component_power_state"));
+            let componentPowerStateElement = (<HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_POWER_STATE));
             componentPowerStateElement.checked = this.currentComponent.getPluggedInState() == ESwitch.ON ? true : false;
             componentPowerStateElement.onchange = () => {
                 this.currentComponent.changePluggedInState(componentPowerStateElement.checked ? 1 : 0, this.electricBoard.getPowerState());
@@ -130,7 +130,7 @@ class BoardUIController {
         }
 
         {
-            let componentForeColorElement = <HTMLInputElement>document.getElementById("input_component_forecolor");
+            let componentForeColorElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_FORECOLOR);
             componentForeColorElement.value = this.currentComponent.getForeColor();
             componentForeColorElement.onchange = () => {
                 this.currentComponent.changeComponentForeColor(componentForeColorElement.value);
@@ -138,7 +138,7 @@ class BoardUIController {
         }
 
         {
-            let componentOnImageElement = <HTMLInputElement>document.getElementById("input_component_on_image");
+            let componentOnImageElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_ON_IMAGE);
             componentOnImageElement.value = this.currentComponent.getOnImage();
             componentOnImageElement.onchange = () => {
                 this.currentComponent.setOnImage(componentOnImageElement.value);
@@ -146,7 +146,7 @@ class BoardUIController {
             }
         }
         {
-            let componentOffImageElement = <HTMLInputElement>document.getElementById("input_component_off_image");
+            let componentOffImageElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_OFF_IMAGE);
             componentOffImageElement.value = this.currentComponent.getOffImage();
             componentOffImageElement.onchange = () => {
                 this.currentComponent.setOffImage(componentOffImageElement.value);
@@ -155,7 +155,7 @@ class BoardUIController {
         }
 
         {
-            let componentPositionXElement = <HTMLInputElement>document.getElementById("input_component_position_x");
+            let componentPositionXElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_POSITION_X);
             componentPositionXElement.value = this.currentComponent.getPosition().getX() + "";
             componentPositionXElement.onchange = () => {
                 this.currentComponent.getPosition().setX(parseInt(componentPositionXElement.value));
@@ -164,7 +164,7 @@ class BoardUIController {
         }
 
         {
-            let componentPositionYElement = <HTMLInputElement>document.getElementById("input_component_position_y");
+            let componentPositionYElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_POSITION_Y);
             componentPositionYElement.value = this.currentComponent.getPosition().getY() + "";
             componentPositionYElement.onchange = () => {
                 this.currentComponent.getPosition().setY(parseInt(componentPositionYElement.value));
@@ -173,7 +173,7 @@ class BoardUIController {
         }
 
         {
-            let customRenderComponent = <HTMLInputElement>document.getElementById("input_custom_render");
+            let customRenderComponent = <HTMLInputElement>document.getElementById(R.INPUT_CUSTOM_RENDER);
             customRenderComponent.value = this.currentComponent.getCustomRender();
             customRenderComponent.onchange = () => {
                 this.currentComponent.setCustomRender(customRenderComponent.value.trim());
@@ -182,7 +182,7 @@ class BoardUIController {
             }
         }
 
-        (<HTMLElement>document.getElementById("btn_submit_component")).style.visibility = "hidden";
+        (<HTMLElement>document.getElementById(R.BTN_SUBMIT_COMPONENT)).style.visibility = "hidden";
 
     }
 
