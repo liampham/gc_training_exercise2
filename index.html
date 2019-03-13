@@ -7,15 +7,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <script src="./dist/base/ESwitch.js"></script>
+    <script src="./dist/base/IObjectBase.js"></script>
+    <script src="./dist/base/IView.js"></script>
     <script src="./dist/base/Logger.js"></script>
-    <script src="./dist/base/ParamsKey.js"></script>
     <script src="./dist/base/Point.js"></script>
-    <script src="./dist/base/Utils.js"></script>
     <script src="./dist/base/Size.js"></script>
+    <script src="./dist/base/Utils.js"></script>
+
+    <script src="./dist/constants/ParamsKey.js"></script>
+    <script src="./dist/constants/R.js"></script>
+
     <script src="./dist/electric/AElectricComponent.js"></script>
+    <script src="./dist/electric/BoardUIController.js"></script>
     <script src="./dist/electric/CommonElectricComponent.js"></script>
     <script src="./dist/electric/ElectricBoard.js"></script>
-    <script src="./dist/electric/BoardUIController.js"></script>
+    <script src="./dist/electric/IElectricBoard.js"></script>
+    <script src="./dist/electric/IElectricComponent.js"></script>
+    <script src="./dist/electric/IElectricComponentView.js"></script>
+
 
     <link rel="stylesheet" href="./assets/css/style.css">
     <link rel="stylesheet" href="./assets/css/animate.css">
@@ -142,26 +151,15 @@
 
 
 
-
-    <!-- <div class="a1-container">
-        <div class="a1-absolute a1-left a1-top" name="component_name">Component Name</div>
-        <img src="" class="a1-content-center" name="img_on">
-        <img src="" class="a1-content-center" name="img_off">
-        <div name="custome_render"></div>
-    </div> -->
-
-
-
-
 </body>
 
 <script>
     window.onload = function () {
         var board = new ElectricBoard("board_container_id");
-        board.setConfig({
+        board.initialize({
             "grid_column": 6,
             "grid_row": 6,
-            "power_switch_state": 1,
+            "power_state": 1,
             "display_component_name": 1,
             "background_color": "#eeffed",
             "electric_components": [
@@ -173,7 +171,7 @@
                     },
                     "on_image": "./assets/images/tv_on.png",
                     "off_image": "./assets/images/tv_off.png",
-                    "switch_state": 0
+                    "power_state": 0
                 },
                 {
                     "name": "Lamp",
@@ -184,7 +182,7 @@
                     },
                     "on_image": "./assets/images/lamp_on.png",
                     "off_image": "./assets/images/lamp_off.png",
-                    "switch_state": 1
+                    "power_state": 1
                 }
             ]
         });

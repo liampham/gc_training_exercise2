@@ -5,48 +5,63 @@ var BoardUIController = /** @class */ (function () {
     }
     BoardUIController.prototype.initializeInputHandlers = function () {
         var _this = this;
-        var btnApplyBoardConfiguration = document.getElementById("btn_apply_board_configuration");
+        var btnApplyBoardConfiguration = document.getElementById(R.BTN_APPLY_BOARD_CONFIGURATION);
         if (btnApplyBoardConfiguration) {
             btnApplyBoardConfiguration.onclick = function () {
                 _this.updateBoardConfigurations();
             };
         }
-        var btnCloseComponentDetailView = document.getElementById("btn_close_component_detail");
+        var btnCloseComponentDetailView = document.getElementById(R.BTN_CLOSE_COMPONENT_DETAIL);
         if (btnCloseComponentDetailView) {
             btnCloseComponentDetailView.onclick = function () {
                 _this.showComponentDetail(false);
             };
         }
+        var btnAddNewComponent = document.getElementById(R.BTN_ADD_COMPONENT);
+        if (btnAddNewComponent) {
+            btnAddNewComponent.onclick = function () {
+                _this.onClickAddNewComponent();
+            };
+        }
+    };
+    BoardUIController.prototype.onClickAddNewComponent = function () {
+        if (this.currentComponent)
+            return;
+        var component = new CommonElectricComponent();
+        var displayComponentName = document.getElementById(R.INPUT_COMPONENT_NAME);
+        if (displayComponentName) {
+            component.setName(displayComponentName.value.trim());
+        }
     };
     BoardUIController.prototype.showComponentDetail = function (show) {
-        var listComponentContainer = document.getElementById("list_components_container");
+        var listComponentContainer = document.getElementById(R.LIST_COMPONENTS_CONTAINER);
         if (listComponentContainer) {
             listComponentContainer.style.display = show ? "none" : "block";
         }
-        var componentDetailContainer = document.getElementById("component_detail_container");
+        var componentDetailContainer = document.getElementById(R.COMPONENT_DETAIL_CONTAINER);
         if (componentDetailContainer) {
             componentDetailContainer.style.display = show ? "block" : "none";
         }
     };
     BoardUIController.prototype.updateBoardConfigurations = function () {
-        var displayComponentName = document.getElementById("input_board_display_component_name");
+        var displayComponentName = document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
         if (displayComponentName) {
-            this.electricBoard.setDisplayComponentName(displayComponentName.checked ? ESwitch.ON : ESwitch.OFF);
+            this.electricBoard.setDisplayComponentNameState(displayComponentName.checked ? ESwitch.ON : ESwitch.OFF);
         }
-        var powerSwitchElement = document.getElementById("input_board_power_switch");
+        var powerSwitchElement = document.getElementById(R.INPUT_BOARD_POWER_SWITCH);
         if (powerSwitchElement) {
             Log.o(powerSwitchElement.checked);
-            this.electricBoard.setPowerSwitchState(powerSwitchElement.checked ? ESwitch.ON : ESwitch.OFF);
+            this.electricBoard.setPowerState(powerSwitchElement.checked ? ESwitch.ON : ESwitch.OFF);
         }
-        var gridRowElement = document.getElementById("input_board_grid_row");
+        var gridRowElement = document.getElementById(R.INPUT_BOARD_GRID_ROW);
         if (gridRowElement) {
             this.electricBoard.setGridRow(parseInt(gridRowElement.value));
         }
-        var gridColumnElement = document.getElementById("input_board_grid_column");
+        var gridColumnElement = document.getElementById(R.INPUT_BOARD_GRID_COLUMN);
         if (gridColumnElement) {
             this.electricBoard.setGridColumn(parseInt(gridColumnElement.value));
         }
-        var backgroundColorElement = document.getElementById("input_board_background_color");
+        var backgroundColorElement = document.getElementById(R.INPUT_BOARD_BACKGROUND_COLOR);
         if (backgroundColorElement) {
             this.electricBoard.setBackgroundColor(backgroundColorElement.value);
         }

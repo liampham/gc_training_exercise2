@@ -7,5 +7,9 @@ var Size = /** @class */ (function () {
     Size.prototype.getWidth = function () { return this.width; };
     Size.prototype.setHeight = function (height) { this.height = height; };
     Size.prototype.getHeight = function () { return this.height; };
+    Size.prototype.set = function (width, height) {
+        this.width = width;
+        this.height = height;
+    };
     return Size;
 }());

@@ -14,5 +14,6 @@ class Point {
     public setY(y: number): void { this.y = y; }
     public getY(): number { return this.y; }
 
+    public set(x: number, y: number): void { this.x = x; this.y = y; }
 
 }

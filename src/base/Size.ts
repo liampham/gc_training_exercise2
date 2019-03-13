@@ -14,5 +14,10 @@ class Size {
     public setHeight(height: number): void { this.height = height; }
     public getHeight(): number { return this.height; }
 
+    public set(width : number, height : number): void{
+        this.width = width;
+        this.height = height;
+    }
+
 
 }

@@ -1,78 +1,38 @@
-class ElectricBoard {
+class ElectricBoard implements IElectricBoard, IObjectBase {
+
 
     public boardElementID: string = "";
-    public powerSwitchState: ESwitch = ESwitch.ON;
-    public displayComponentName: ESwitch = ESwitch.ON;
+    public powerState: ESwitch = ESwitch.ON;
+    public displayComponentNameState: ESwitch = ESwitch.ON;
     public gridRow: number = 6;
     public gridColumn: number = 6;
     public backgroundColor: string = "white";
-    public electricComponents: Array<AElectricComponent> = [];
+    public electricComponents: Array<IElectricComponent> = [];
     public gridCellSize: Size = new Size();
 
     constructor(boardElementID: string) {
         this.boardElementID = boardElementID;
     }
 
-    public setConfig(config: object) {
-        if (!config) return;
-        if (ParamsKey._POWER_SWITCH_STATE_ in config) { this.setPowerSwitchState(config[ParamsKey._POWER_SWITCH_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF); }
-        if (ParamsKey._DISPLAY_COMPONENT_NAME_ in config) { this.setDisplayComponentName(config[ParamsKey._DISPLAY_COMPONENT_NAME_] == 1 ? ESwitch.ON : ESwitch.OFF); }
-        if (ParamsKey._GRID_ROW_ in config) { this.setGridRow(config[ParamsKey._GRID_ROW_]); }
-        if (ParamsKey._GRID_COLUMN_ in config) { this.setGridColumn(config[ParamsKey._GRID_COLUMN_]); }
-        if (ParamsKey._BACKGROUND_COLOR_ in config) { this.setBackgroundColor(config[ParamsKey._BACKGROUND_COLOR_]); }
-        if (ParamsKey._ELECTRIC_COMPONENTS_ in config) {
-            let componentDatas = config[ParamsKey._ELECTRIC_COMPONENTS_];
-            if (componentDatas) {
-                for (let data of componentDatas) {
-                    let electricComponent: AElectricComponent = new CommonElectricComponent();
-                    electricComponent.setConfig(data);
-                    this.addElectricComponent(electricComponent);
-                }
-            }
-        }
-    }
+    public setGridRow(gridRow: number): void { this.gridRow = gridRow; }
+    public setGridColumn(gridColumn: number): void { this.gridColumn = gridColumn; }
 
-    public setGridRow(gridRow: number): void {
-        this.gridRow = gridRow;
-    }
-    public setGridColumn(gridColumn: number): void {
-        this.gridColumn = gridColumn;
-    }
+    public getGridRow(): number { return this.gridRow; }
+    public getGridColumn(): number { return this.gridColumn; }
 
-    public getGridRow(): number {
-        return this.gridRow;
-    }
-    public getGridColumn(): number {
-        return this.gridColumn;
-    }
-    public setBackgroundColor(backgroundColor: string): void {
-        this.backgroundColor = backgroundColor;
-    }
+    public setBackgroundColor(backgroundColor: string): void { this.backgroundColor = backgroundColor; }
+    public getBackgroundColor(): string { return this.backgroundColor; }
 
-    public getBackgroundColor(): string {
-        return this.backgroundColor;
-    }
-    public setDisplayComponentName(displayComponent: ESwitch): void {
-        this.displayComponentName = displayComponent;
-    }
-    public getDisplayComponentName(): ESwitch {
-        return this.displayComponentName;
-    }
-    public setPowerSwitchState(powerState: ESwitch) {
-        this.powerSwitchState = powerState;
-    }
-    public getPowerSwitchState(): ESwitch {
-        return this.powerSwitchState;
-    }
+    public setDisplayComponentNameState(displayComponentState: ESwitch): void { this.displayComponentNameState = displayComponentState; }
+    public getDisplayComponentNameState(): ESwitch { return this.displayComponentNameState; }
 
-    public getGridCellSize(): Size {
-        return this.gridCellSize;
-    }
-    public setGridCellSize(size: Size): void {
-        this.gridCellSize = size;
-    }
+    public setPowerState(powerState: ESwitch) { this.powerState = powerState; }
+    public getPowerState(): ESwitch { return this.powerState; }
 
-    public addElectricComponent(component: AElectricComponent, ignoreWhenCellIsFilled: boolean = true): void {
+    public setGridCellSize(size: Size): void { this.gridCellSize = size; }
+    public getGridCellSize(): Size { return this.gridCellSize; }
+
+    public addElectricComponent(component: IElectricComponent, ignoreWhenCellIsFilled: boolean = true): void {
         if (!ignoreWhenCellIsFilled) {
             let found = this.electricComponents.find(ec => {
                 return ec.getPosition().getX() == component.getPosition().getX() && ec.getPosition().getY() == component.getPosition().getY();
@@ -82,14 +42,14 @@ class ElectricBoard {
         this.electricComponents.push(component);
     }
 
-    public removeElectricComponent(component: AElectricComponent): void {
+    public removeElectricComponent(component: IElectricComponent): void {
         let index: number = this.electricComponents.indexOf(component);
         if (index != -1) {
             this.electricComponents.splice(index, 1);
         }
     }
 
-    public getElectricComponents(): Array<AElectricComponent> {
+    public getElectricComponents(): Array<IElectricComponent> {
         return this.electricComponents;
     }
 
@@ -102,8 +62,7 @@ class ElectricBoard {
 
         container.innerHTML = "";
 
-        this.getGridCellSize().setWidth(Math.floor(container.clientWidth / this.getGridColumn()));
-        this.getGridCellSize().setHeight(Math.floor(container.clientHeight / this.getGridRow()));
+        this.getGridCellSize().set(Math.floor(container.clientWidth / this.getGridColumn()), Math.floor(container.clientHeight / this.getGridRow()));
 
         this.drawGrid(container);
 
@@ -154,5 +113,29 @@ class ElectricBoard {
         container.appendChild(svg);
 
     }
+
+
+
+
+    //Override
+    public initialize(properties: object): void {
+        if (!properties) return;
+        if (ParamsKey._POWER_STATE_ in properties) { this.setPowerState(properties[ParamsKey._POWER_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF); }
+        if (ParamsKey._DISPLAY_COMPONENT_NAME_ in properties) { this.setDisplayComponentNameState(properties[ParamsKey._DISPLAY_COMPONENT_NAME_] == 1 ? ESwitch.ON : ESwitch.OFF); }
+        if (ParamsKey._GRID_ROW_ in properties) { this.setGridRow(properties[ParamsKey._GRID_ROW_]); }
+        if (ParamsKey._GRID_COLUMN_ in properties) { this.setGridColumn(properties[ParamsKey._GRID_COLUMN_]); }
+        if (ParamsKey._BACKGROUND_COLOR_ in properties) { this.setBackgroundColor(properties[ParamsKey._BACKGROUND_COLOR_]); }
+        if (ParamsKey._ELECTRIC_COMPONENTS_ in properties) {
+            let componentDatas = properties[ParamsKey._ELECTRIC_COMPONENTS_];
+            if (componentDatas) {
+                for (let componentProperties of componentDatas) {
+                    let electricComponent: IElectricComponent = new CommonElectricComponent();
+                    electricComponent.initialize(componentProperties);
+                    this.addElectricComponent(electricComponent);
+                }
+            }
+        }
+    }
+
 
 }

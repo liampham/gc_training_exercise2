@@ -55,11 +55,11 @@ body{
   }
   
   input:checked + .slider {
-    background-color: #0638FF;
+    background-color: #06FF0E;
   }
   
   input:focus + .slider {
-    box-shadow: 0 0 1px #0638FF;
+    box-shadow: 0 0 1px #06FF0E;
   }
   
   input:checked + .slider:before {
@@ -86,5 +86,5 @@ body{
   
   /* Darker background on mouse-over */
   .btn:hover {
-    background-color: #0638FF;
+    background-color: rgba(6, 56, 255, 0.836);
   }
