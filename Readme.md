@@ -3,6 +3,16 @@
 - Author : LiamPham
 - Date : 12/03/2019
 
+
+## How to run this test 
+- Clone source code from main repo
+- Open file index.html 
+
+## Modify source 
+- Install nodejs 
+- Run command : "npm run build" 
+
+
 ## Requirements
 
 **Create an "Test electric board" web component.**
