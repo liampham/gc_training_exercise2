@@ -1,11 +1,13 @@
 abstract class AElectricComponent implements IElectricComponent {
+ 
+
 
     protected view: HTMLElement;
 
     protected name: string = "";
     protected position: Point = new Point();
     protected foreColor: string = "black";
-    protected powerState: ESwitch = ESwitch.ON;
+    protected pluggedInState: ESwitch = ESwitch.ON;
     protected state: number = 1;
     protected onImage: string = "";
     protected offImage: string = "";
@@ -21,8 +23,8 @@ abstract class AElectricComponent implements IElectricComponent {
     public setForeColor(color: string): void { this.foreColor = color; }
     public getForeColor(): string { return this.foreColor; }
 
-    public setPowerState(powerState: ESwitch): void { this.powerState = powerState; }
-    public getPowerState(): ESwitch { return this.powerState; }
+    public setPluggedInState(pluggedInState: ESwitch): void { this.pluggedInState = pluggedInState; }
+    public getPluggedInState(): ESwitch { return this.pluggedInState; }
 
     public setState(state: number): void { this.state = state; }
     public getState(): number { return this.state; }
@@ -33,6 +35,12 @@ abstract class AElectricComponent implements IElectricComponent {
     public setOffImage(image: string): void { this.offImage = image; }
     public getOffImage(): string { return this.offImage; }
 
+    getCustomRender(): string {
+        return this.customRender;
+    }
+    setCustomRender(renderStr: string): void {
+        this.customRender = renderStr;
+    }
 
 
 
@@ -52,21 +60,38 @@ abstract class AElectricComponent implements IElectricComponent {
 
         this.renderDisplayComponentName(board);
 
-        this.renderComponentImage(board);
+        this.renderComponentImage(board.getPowerState());
 
     }
 
     /**Detect what image should show based on component status and board power state */
-    private renderComponentImage(board: IElectricBoard): void {
+    private renderComponentImage(boardPluggedInState: ESwitch): void {
+        if (this.customRender) {
+            let imageEles = this.getView().getElementsByClassName("component_image");
+            if (imageEles.length > 0) {
+                (<HTMLImageElement>imageEles[0]).style.visibility = "hidden";
+            }
+
+            let customRenders = this.getView().getElementsByClassName("custom_render");
+            if (customRenders.length > 0) {
+                (<HTMLElement>customRenders[0]).innerHTML = this.customRender;
+            }
+
+            return;
+        }
+
+
+
         var imgSrc = this.getOffImage();
 
-        if (this.getPowerState() == ESwitch.ON && board.getPowerState() == ESwitch.ON) {
+        if (this.getPluggedInState() == ESwitch.ON && boardPluggedInState == ESwitch.ON) {
             imgSrc = this.getOnImage();
         }
 
         let imageEles = this.getView().getElementsByClassName("component_image");
         if (imageEles && imageEles.length > 0) {
             if (imgSrc && imgSrc.length > 0) {
+                (<HTMLImageElement>imageEles[0]).style.visibility = "visible";
                 (<HTMLImageElement>imageEles[0]).src = imgSrc;
             } else {
                 imageEles[0].remove();
@@ -99,10 +124,11 @@ abstract class AElectricComponent implements IElectricComponent {
             }
         }
         if (ParamsKey._FORE_COLOR_ in properties) { this.setForeColor(properties[ParamsKey._FORE_COLOR_]); }
-        if (ParamsKey._POWER_STATE_ in properties) { this.setPowerState(properties[ParamsKey._POWER_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF); }
+        if (ParamsKey._PLUGGED_IN_STATE_ in properties) { this.setPluggedInState(properties[ParamsKey._PLUGGED_IN_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF); }
         if (ParamsKey._STATE_ in properties) { this.setState(properties[ParamsKey._STATE_]); }
         if (ParamsKey._ON_IMAGE_ in properties) { this.setOnImage(properties[ParamsKey._ON_IMAGE_]); }
         if (ParamsKey._OFF_IMAGE_ in properties) { this.setOffImage(properties[ParamsKey._OFF_IMAGE_]); }
+        if (ParamsKey._CUSTOME_RENDER_ in properties) { this.customRender = properties[ParamsKey._CUSTOME_RENDER_]; }
     }
 
     //Override
@@ -113,14 +139,32 @@ abstract class AElectricComponent implements IElectricComponent {
     turnOff(): void {
 
     }
-    //Override
-    powerOn(): void {
 
+    //Override
+    onBoardPowerStateChanged(boardPluggedInState: ESwitch): void {
+        this.renderComponentImage(boardPluggedInState);
     }
 
     //Override
-    powerOff(): void {
-
+    changeComponentName(name: string): void {
+        this.setName(name);
+        let nameEles = this.getView().getElementsByClassName("component_name");
+        if (nameEles && nameEles.length > 0) {
+            nameEles[0].innerHTML = this.getName();
+        }
+    }
+    //Override
+    changeComponentForeColor(color: string) {
+        this.setForeColor(color);
+        let nameEles = this.getView().getElementsByClassName("component_name");
+        if (nameEles && nameEles.length > 0) {
+            (<HTMLElement>nameEles[0]).style.color = this.getForeColor();
+        }
+    }
+    //Override
+    changePluggedInState(state: number, boardPowerState: ESwitch): void {
+        this.setPluggedInState(state == 1 ? ESwitch.ON : ESwitch.OFF);
+        this.onBoardPowerStateChanged(boardPowerState);
     }
 
     //Override

@@ -1,15 +1,36 @@
-interface IElectricComponent extends IObjectBase,IView,IElectricComponentView{
-    
-    getPosition() : Point;
+interface IElectricComponent extends IObjectBase, IView, IElectricComponentView {
+    getCustomRender(): string;
+    setCustomRender(renderStr: string): void;
 
-    turnOn() : void;
+    getName(): string;
 
-    turnOff() : void;
+    getOnImage(): string;
 
-    powerOn() : void;
+    getOffImage(): string;
 
-    powerOff() : void;
+    setOnImage(image: string): void;
 
-    displayComponentName(display : boolean ) : void;
+    setOffImage(image: string): void;
 
+    getPosition(): Point;
+
+    turnOn(): void;
+
+    turnOff(): void;
+
+    getState(): number;
+
+    getForeColor(): string;
+
+    getPluggedInState(): ESwitch;
+
+    onBoardPowerStateChanged(powerState: ESwitch): void;
+
+    displayComponentName(display: boolean): void;
+
+    changeComponentName(name: string): void;
+
+    changePluggedInState(state: number, boardPowerState: ESwitch);
+
+    changeComponentForeColor(color: string);
 }

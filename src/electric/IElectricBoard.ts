@@ -1,4 +1,7 @@
 interface IElectricBoard {
+    
+    removeElectricComponent(ec: IElectricComponent): void;
+
 
     setDisplayComponentNameState(displayState: ESwitch): void;
     getDisplayComponentNameState(): ESwitch;
@@ -8,10 +11,15 @@ interface IElectricBoard {
 
     getGridCellSize(): Size;
 
-    setGridRow(gridRow : number) : void;
-    setGridColumn(gridColumn : number) : void;
+    setGridRow(gridRow: number): void;
+    setGridColumn(gridColumn: number): void;
 
-    setBackgroundColor(color : string) : void;
+    setBackgroundColor(color: string): void;
+    changeBackgroundColor(): void;
 
-    render() : void;
+    getElectricComponents(): Array<IElectricComponent>;
+    pluggedInNewComponent(electricComponent : IElectricComponent) : void;
+    render(): void;
+
+
 }

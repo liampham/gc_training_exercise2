@@ -13,4 +13,6 @@ class ParamsKey {
     public static _BACKGROUND_COLOR_: string = "background_color";
     public static _DISPLAY_COMPONENT_NAME_: string = "display_component_name";
     public static _ELECTRIC_COMPONENTS_: string = "electric_components";
+    public static _PLUGGED_IN_STATE_: string = "plugged_in_state";
+    public static _CUSTOME_RENDER_: string = "custom_render";
 }

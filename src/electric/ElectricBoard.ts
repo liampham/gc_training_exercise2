@@ -45,6 +45,7 @@ class ElectricBoard implements IElectricBoard, IObjectBase {
     public removeElectricComponent(component: IElectricComponent): void {
         let index: number = this.electricComponents.indexOf(component);
         if (index != -1) {
+            this.electricComponents[index].getView().remove();
             this.electricComponents.splice(index, 1);
         }
     }
@@ -137,5 +138,26 @@ class ElectricBoard implements IElectricBoard, IObjectBase {
         }
     }
 
+    changeBackgroundColor(): void {
 
+        if (!this.boardElementID || this.boardElementID.length == 0) return;
+        let container = document.getElementById(this.boardElementID);
+        if (!container) return;
+
+        let svgEles = container.getElementsByTagName("svg");
+        if (svgEles && svgEles.length > 0) {
+            svgEles[0].style.backgroundColor = this.getBackgroundColor();
+        }
+    }
+
+    pluggedInNewComponent(electricComponent: IElectricComponent): void {
+        this.addElectricComponent(electricComponent);
+        if (!this.boardElementID || this.boardElementID.length == 0) return;
+
+        let container = document.getElementById(this.boardElementID);
+        if (!container) return;
+        electricComponent.render(this);
+        container.appendChild(electricComponent.getView());
+
+    }
 }
