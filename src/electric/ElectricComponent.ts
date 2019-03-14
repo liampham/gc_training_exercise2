@@ -1,22 +1,34 @@
 class ElectricComponent implements IElectricComponent {
+    private view: HTMLElement;
+    private name: string = "";
+    private row: number = -1;
+    private column: number = -1;
+    private foreColor: string = "black";
+    private lightState: ESwitch = ESwitch.ON;
+    private onImage: string = "";
+    private offImage: string = "";
+    private customRender: string = "";
+    private board: IElectricBoard;
 
-    protected view: HTMLElement;
-    protected name: string = "";
-    protected row: number = -1;
-    protected column: number = -1;
-    protected foreColor: string = "black";
-    protected lightState: ESwitch = ESwitch.ON;
-    protected onImage: string = "";
-    protected offImage: string = "";
-    protected customRender: string = "";
+    constructor() { }
 
-    protected board: IElectricBoard;
+    initialize(properties: object): void {
+        if (!properties) return;
 
-    constructor() {
+        if (ParamsKey._NAME_ in properties) { this.setName(properties[ParamsKey._NAME_]); }
 
+        if (ParamsKey._COLUMN_ in properties) {
+            this.setColumn(properties[ParamsKey._COLUMN_]);
+        }
+        if (ParamsKey._ROW_ in properties) {
+            this.setRow(properties[ParamsKey._ROW_]);
+        }
+        if (ParamsKey._FORE_COLOR_ in properties) { this.setForeColor(properties[ParamsKey._FORE_COLOR_]); }
+        if (ParamsKey._TURN_ON_ in properties) { this.lightState = properties[ParamsKey._TURN_ON_] == 1 ? ESwitch.ON : ESwitch.OFF; }
+        if (ParamsKey._ON_IMAGE_ in properties) { this.setOnImage(properties[ParamsKey._ON_IMAGE_]); }
+        if (ParamsKey._OFF_IMAGE_ in properties) { this.setOffImage(properties[ParamsKey._OFF_IMAGE_]); }
+        if (ParamsKey._CUSTOME_RENDER_ in properties) { this.customRender = properties[ParamsKey._CUSTOME_RENDER_]; }
     }
-
-    //Override
     getView(): HTMLElement {
         if (this.view == null || this.view == undefined) {
             this.view = document.createElement("div");
@@ -26,32 +38,44 @@ class ElectricComponent implements IElectricComponent {
         }
         return this.view;
     }
-
-    //Override
     setView(view: HTMLElement): void {
         this.view = view;
     }
-
     addSubView(view: IView): void {
         this.view.appendChild(view.getView());
     }
-
     removeSubView(view: IView) {
         this.view.removeChild(view.getView());
     }
-
-    private getElectricBoard(): IElectricBoard { return this.board; }
-
-    public setName(name: string): void {
+    getCustomRender(): string {
+        return this.customRender;
+    }
+    setCustomRender(renderStr: string): void {
+        this.customRender = renderStr;
+        this.updateComponentUI();
+    }
+    getName(): string {
+        return this.name;
+    }
+    setName(name: string): void {
         this.name = name;
         let nameEles = this.getView().getElementsByClassName("component_name");
         if (nameEles && nameEles.length > 0) {
             nameEles[0].innerHTML = this.getName();
         }
     }
-
-    public getName(): string { return this.name; }
-
+    setOnImage(image: string): void {
+        this.onImage = image;
+    }
+    getOnImage(): string {
+        return this.onImage;
+    }
+    setOffImage(image: string): void {
+        this.offImage = image;
+    }
+    getOffImage(): string {
+        return this.offImage;
+    }
     getColumn(): number {
         return this.column;
     }
@@ -66,67 +90,62 @@ class ElectricComponent implements IElectricComponent {
         this.row = row;
         this.updateSizeAndLocation();
     }
-
-    public setForeColor(color: string): void {
+    getForeColor(): string {
+        return this.foreColor;
+    }
+    setForeColor(color: string): void {
         this.foreColor = color;
         let nameEles = this.getView().getElementsByClassName("component_name");
         if (nameEles && nameEles.length > 0) {
             (<HTMLElement>nameEles[0]).style.color = this.getForeColor();
         }
     }
-    public getForeColor(): string {
-        return this.foreColor;
+    isTurnedOn(): boolean {
+        return this.lightState == ESwitch.ON;
     }
-
+    turnOn(): void {
+        this.lightState = ESwitch.ON;
+        this.updateComponentUI();
+    }
+    turnOff(): void {
+        this.lightState = ESwitch.OFF;
+        this.updateComponentUI();
+    }
+    pluggedIn(board: IElectricBoard) {
+        this.board = board;
+        this.updateSizeAndLocation();
+        this.updateComponentName();
+        this.updateComponentUI();
+    }
+    unPluggedIn() {
+        this.getElectricBoard().removeSubView(this);
+    }
+    updateSizeAndLocation(): void {
+        if (!this.board) return;
+        this.getView().style.left = this.getElectricBoard().getGridCellSize().width * this.getColumn() + "px";
+        this.getView().style.top = this.getElectricBoard().getGridCellSize().height * this.getRow() + "px";
+        this.getView().style.width = `${this.getElectricBoard().getGridCellSize().getWidth()}px`;
+        this.getView().style.height = `${this.getElectricBoard().getGridCellSize().getHeight()}px`;
+    }
     powerOn(): void {
         let imageEles = this.getView().getElementsByClassName("component_image");
         if (imageEles && imageEles.length > 0) {
             (<HTMLImageElement>imageEles[0]).src = this.getOnImage();
         }
     }
-
     powerOff(): void {
         let imageEles = this.getView().getElementsByClassName("component_image");
         if (imageEles && imageEles.length > 0) {
             (<HTMLImageElement>imageEles[0]).src = this.getOffImage();
         }
     }
-
-    isTurnedOn(): boolean {
-        return this.lightState == ESwitch.ON;
-    };
-
-    turnOn(): void {
-        this.lightState = ESwitch.ON;
-        this.updateComponentUI();
-    }
-
-    turnOff(): void {
-        this.lightState = ESwitch.OFF;
-        this.updateComponentUI();
-    }
-
-    public setOnImage(image: string): void {
-        this.onImage = image;
-    }
-    public getOnImage(): string {
-        return this.onImage;
-    }
-
-    public setOffImage(image: string): void {
-        this.offImage = image;
-    }
-    public getOffImage(): string {
-        return this.offImage;
-    }
-
-    getCustomRender(): string {
-        return this.customRender;
-    }
-
-    setCustomRender(renderStr: string): void {
-        this.customRender = renderStr;
-        this.updateComponentUI();
+    showComponentName(display: boolean): void {
+        let nameEles = this.getView().getElementsByClassName("component_name");
+        if (nameEles && nameEles.length > 0) {
+            nameEles[0].innerHTML = this.getName();
+            (<HTMLElement>nameEles[0]).style.color = this.getForeColor();
+            (<HTMLElement>nameEles[0]).style.visibility = display ? "visible" : "hidden";
+        }
     }
 
     /**Detect what image should show based on component status and board power state */
@@ -175,56 +194,10 @@ class ElectricComponent implements IElectricComponent {
         if (nameEles && nameEles.length > 0) {
             nameEles[0].innerHTML = this.getName();
             (<HTMLElement>nameEles[0]).style.color = this.getForeColor();
-            (<HTMLElement>nameEles[0]).style.visibility = this.getElectricBoard().isDisplayingComponentName() ? "visible" : "hidden";
+            (<HTMLElement>nameEles[0]).style.visibility = this.getElectricBoard().isShowingComponentName() ? "visible" : "hidden";
         }
     }
-
-    //Override
-    initialize(properties: object): void {
-        if (!properties) return;
-
-        if (ParamsKey._NAME_ in properties) { this.setName(properties[ParamsKey._NAME_]); }
-
-        if (ParamsKey._COLUMN_ in properties) {
-            this.setColumn(properties[ParamsKey._COLUMN_]);
-        }
-        if (ParamsKey._ROW_ in properties) {
-            this.setRow(properties[ParamsKey._ROW_]);
-        }
-        if (ParamsKey._FORE_COLOR_ in properties) { this.setForeColor(properties[ParamsKey._FORE_COLOR_]); }
-        if (ParamsKey._TURN_ON_ in properties) { this.lightState = properties[ParamsKey._TURN_ON_] == 1 ? ESwitch.ON : ESwitch.OFF; }
-        if (ParamsKey._ON_IMAGE_ in properties) { this.setOnImage(properties[ParamsKey._ON_IMAGE_]); }
-        if (ParamsKey._OFF_IMAGE_ in properties) { this.setOffImage(properties[ParamsKey._OFF_IMAGE_]); }
-        if (ParamsKey._CUSTOME_RENDER_ in properties) { this.customRender = properties[ParamsKey._CUSTOME_RENDER_]; }
+    private getElectricBoard(): IElectricBoard {
+        return this.board;
     }
-
-    //Override
-    displayComponentName(display: boolean): void {
-        let nameEles = this.getView().getElementsByClassName("component_name");
-        if (nameEles && nameEles.length > 0) {
-            nameEles[0].innerHTML = this.getName();
-            (<HTMLElement>nameEles[0]).style.color = this.getForeColor();
-            (<HTMLElement>nameEles[0]).style.visibility = display ? "visible" : "hidden";
-        }
-    }
-
-    pluggedIn(board: IElectricBoard) {
-        this.board = board;
-        this.updateSizeAndLocation();
-        this.updateComponentName();
-        this.updateComponentUI();
-    }
-
-    unPluggedIn() {
-        this.getElectricBoard().removeSubView(this);
-    }
-
-    public updateSizeAndLocation() {
-        if (!this.board) return;
-        this.getView().style.left = this.getElectricBoard().getGridCellSize().width * this.getColumn() + "px";
-        this.getView().style.top = this.getElectricBoard().getGridCellSize().height * this.getRow() + "px";
-        this.getView().style.width = `${this.getElectricBoard().getGridCellSize().getWidth()}px`;
-        this.getView().style.height = `${this.getElectricBoard().getGridCellSize().getHeight()}px`;
-    }
-
 }

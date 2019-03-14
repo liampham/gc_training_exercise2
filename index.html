@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <script src="./dist/base/Cell.js"></script>
     <script src="./dist/base/ESwitch.js"></script>
     <script src="./dist/base/IObjectBase.js"></script>
     <script src="./dist/base/IView.js"></script>
     <script src="./dist/base/Logger.js"></script>
-    <script src="./dist/base/Point.js"></script>
     <script src="./dist/base/Size.js"></script>
     <script src="./dist/base/Utils.js"></script>
 
@@ -31,7 +29,6 @@
 </head>
 
 <body>
-
     <div class="a1-container-absolute">
         <div class="a1-container a3-container">
             <div class="a3-flex-1 a1-height-100" style="overflow: auto; max-height: 100vh;">
@@ -40,7 +37,7 @@
 
                     <div class="a1-padding a1-text-center">
                         <div class="a1-text-center">
-                            <h3>Electric Board</h3>
+                            <h2>Electric Board</h2>
                         </div>
                         <div id="board_container_id"
                             style="display: inline-block; width : 480px; height: 480px; position: relative; border: solid 1px black; overflow: hidden;">
@@ -97,7 +94,7 @@
                         </div>
 
                         <div class="a1-padding a1-text-center">
-                            <button id="btn_add_component" class="primary_button">
+                            <button id="btn_add_component" class="primary_button cursor-pointer">
                                 <div class="a3-container-center">
                                     <img src="./assets/images/add.png" style="width:16px; height:16px;"
                                         class="a1-padding-right">ADD NEW
@@ -157,7 +154,7 @@
                         </div>
 
                         <div class="a1-padding a1-text-center">
-                            <button id="btn_submit_component" class="primary_button">
+                            <button id="btn_submit_component" class="primary_button cursor-pointer">
                                 Submit
                             </button>
                         </div>
@@ -179,8 +176,8 @@
         board.initialize({
             "grid_column":8,
             "grid_row": 8,
-            "power_state": 0,
-            "display_component_name": 0,
+            "power_state": 1,
+            "display_component_name": 1,
             "background_color": "#eeffed",
             "electric_components": [
                 {
@@ -200,7 +197,15 @@
                     "off_image": "./assets/images/lamp_off.png",
                     "turn_on": 1
                 },
-            
+                {
+                    "name": "DW",
+                    "fore_color": "red",
+                    "column": 6,
+                    "row" :4,
+                    "on_image": "./assets/images/dishwasher_on.png",
+                    "off_image": "./assets/images/dishwasher_off.png",
+                    "turn_on": 1
+                },
                 {
                     "name": "HTML",
                     "fore_color": "green",

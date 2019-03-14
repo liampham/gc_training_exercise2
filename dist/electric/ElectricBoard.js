@@ -37,26 +37,26 @@ var ElectricBoard = /** @class */ (function () {
                     var componentProperties = componentDatas_1[_i];
                     var electricComponent = new ElectricComponent();
                     electricComponent.initialize(componentProperties);
-                    this.plugInComponent(electricComponent);
+                    this.plugInElectricComponent(electricComponent);
                 }
             }
         }
     };
-    ElectricBoard.prototype.isDisplayingComponentName = function () {
+    ElectricBoard.prototype.isShowingComponentName = function () {
         return this.displayComponentNameState == ESwitch.ON;
     };
-    ElectricBoard.prototype.displayComponentNameOn = function () {
+    ElectricBoard.prototype.showComponentName = function () {
         this.displayComponentNameState = ESwitch.ON;
         for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
             var ec = _a[_i];
-            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
+            ec.showComponentName(this.isShowingComponentName() ? true : false);
         }
     };
-    ElectricBoard.prototype.displayComponentNameOff = function () {
+    ElectricBoard.prototype.hideComponentName = function () {
         this.displayComponentNameState = ESwitch.OFF;
         for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
             var ec = _a[_i];
-            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
+            ec.showComponentName(this.isShowingComponentName() ? true : false);
         }
     };
     ElectricBoard.prototype.isPowerOn = function () {
@@ -119,12 +119,12 @@ var ElectricBoard = /** @class */ (function () {
             return col == ec.getColumn() && row == ec.getRow();
         });
     };
-    ElectricBoard.prototype.plugInComponent = function (ec) {
+    ElectricBoard.prototype.plugInElectricComponent = function (ec) {
         this.electricComponents.push(ec);
         ec.pluggedIn(this);
         this.addSubView(ec);
     };
-    ElectricBoard.prototype.unPlugInComponent = function (ec) {
+    ElectricBoard.prototype.unPlugInElectricComponent = function (ec) {
         var index = this.electricComponents.indexOf(ec);
         if (index == -1)
             return;
@@ -146,7 +146,6 @@ var ElectricBoard = /** @class */ (function () {
         this.view.removeChild(view.getView());
     };
     ElectricBoard.prototype.drawGrid = function () {
-        // remove current grid
         var grids = this.getView().getElementsByClassName("board-grid");
         for (var i = 0; i < grids.length; i++) {
             grids.item(i).remove();

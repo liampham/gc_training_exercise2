@@ -7,7 +7,6 @@ class ElectricBoard implements IElectricBoard, IObjectBase {
     private backgroundColor: string = "white";
     private electricComponents: Array<IElectricComponent> = [];
     private gridCellSize: Size = new Size();
-
     private view: HTMLElement;
 
     constructor(boardElementID: string) {
@@ -29,24 +28,24 @@ class ElectricBoard implements IElectricBoard, IObjectBase {
                 for (let componentProperties of componentDatas) {
                     let electricComponent: IElectricComponent = new ElectricComponent();
                     electricComponent.initialize(componentProperties);
-                    this.plugInComponent(electricComponent);
+                    this.plugInElectricComponent(electricComponent);
                 }
             }
         }
     }
-    isDisplayingComponentName(): boolean {
+    isShowingComponentName(): boolean {
         return this.displayComponentNameState == ESwitch.ON;
     }
-    displayComponentNameOn(): void {
+    showComponentName(): void {
         this.displayComponentNameState = ESwitch.ON;
         for (let ec of this.electricComponents) {
-            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
+            ec.showComponentName(this.isShowingComponentName() ? true : false);
         }
     }
-    displayComponentNameOff(): void {
+    hideComponentName(): void {
         this.displayComponentNameState = ESwitch.OFF;
         for (let ec of this.electricComponents) {
-            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
+            ec.showComponentName(this.isShowingComponentName() ? true : false);
         }
     }
     isPowerOn(): boolean {
@@ -101,15 +100,14 @@ class ElectricBoard implements IElectricBoard, IObjectBase {
             return col == ec.getColumn() && row == ec.getRow();
         });
     }
-    plugInComponent(ec: IElectricComponent): void {
+    plugInElectricComponent(ec: IElectricComponent): void {
         this.electricComponents.push(ec);
         ec.pluggedIn(this);
         this.addSubView(ec);
     }
-    unPlugInComponent(ec: IElectricComponent): void {
+    unPlugInElectricComponent(ec: IElectricComponent): void {
         let index: number = this.electricComponents.indexOf(ec);
         if (index == -1) return;
-
         this.electricComponents[index].unPluggedIn();
         this.electricComponents.splice(index, 1);
     }

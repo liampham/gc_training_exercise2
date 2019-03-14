@@ -9,7 +9,34 @@ var ElectricComponent = /** @class */ (function () {
         this.offImage = "";
         this.customRender = "";
     }
-    //Override
+    ElectricComponent.prototype.initialize = function (properties) {
+        if (!properties)
+            return;
+        if (ParamsKey._NAME_ in properties) {
+            this.setName(properties[ParamsKey._NAME_]);
+        }
+        if (ParamsKey._COLUMN_ in properties) {
+            this.setColumn(properties[ParamsKey._COLUMN_]);
+        }
+        if (ParamsKey._ROW_ in properties) {
+            this.setRow(properties[ParamsKey._ROW_]);
+        }
+        if (ParamsKey._FORE_COLOR_ in properties) {
+            this.setForeColor(properties[ParamsKey._FORE_COLOR_]);
+        }
+        if (ParamsKey._TURN_ON_ in properties) {
+            this.lightState = properties[ParamsKey._TURN_ON_] == 1 ? ESwitch.ON : ESwitch.OFF;
+        }
+        if (ParamsKey._ON_IMAGE_ in properties) {
+            this.setOnImage(properties[ParamsKey._ON_IMAGE_]);
+        }
+        if (ParamsKey._OFF_IMAGE_ in properties) {
+            this.setOffImage(properties[ParamsKey._OFF_IMAGE_]);
+        }
+        if (ParamsKey._CUSTOME_RENDER_ in properties) {
+            this.customRender = properties[ParamsKey._CUSTOME_RENDER_];
+        }
+    };
     ElectricComponent.prototype.getView = function () {
         if (this.view == null || this.view == undefined) {
             this.view = document.createElement("div");
@@ -19,7 +46,6 @@ var ElectricComponent = /** @class */ (function () {
         }
         return this.view;
     };
-    //Override
     ElectricComponent.prototype.setView = function (view) {
         this.view = view;
     };
@@ -29,7 +55,16 @@ var ElectricComponent = /** @class */ (function () {
     ElectricComponent.prototype.removeSubView = function (view) {
         this.view.removeChild(view.getView());
     };
-    ElectricComponent.prototype.getElectricBoard = function () { return this.board; };
+    ElectricComponent.prototype.getCustomRender = function () {
+        return this.customRender;
+    };
+    ElectricComponent.prototype.setCustomRender = function (renderStr) {
+        this.customRender = renderStr;
+        this.updateComponentUI();
+    };
+    ElectricComponent.prototype.getName = function () {
+        return this.name;
+    };
     ElectricComponent.prototype.setName = function (name) {
         this.name = name;
         var nameEles = this.getView().getElementsByClassName("component_name");
@@ -37,7 +72,18 @@ var ElectricComponent = /** @class */ (function () {
             nameEles[0].innerHTML = this.getName();
         }
     };
-    ElectricComponent.prototype.getName = function () { return this.name; };
+    ElectricComponent.prototype.setOnImage = function (image) {
+        this.onImage = image;
+    };
+    ElectricComponent.prototype.getOnImage = function () {
+        return this.onImage;
+    };
+    ElectricComponent.prototype.setOffImage = function (image) {
+        this.offImage = image;
+    };
+    ElectricComponent.prototype.getOffImage = function () {
+        return this.offImage;
+    };
     ElectricComponent.prototype.getColumn = function () {
         return this.column;
     };
@@ -52,6 +98,9 @@ var ElectricComponent = /** @class */ (function () {
         this.row = row;
         this.updateSizeAndLocation();
     };
+    ElectricComponent.prototype.getForeColor = function () {
+        return this.foreColor;
+    };
     ElectricComponent.prototype.setForeColor = function (color) {
         this.foreColor = color;
         var nameEles = this.getView().getElementsByClassName("component_name");
@@ -59,8 +108,33 @@ var ElectricComponent = /** @class */ (function () {
             nameEles[0].style.color = this.getForeColor();
         }
     };
-    ElectricComponent.prototype.getForeColor = function () {
-        return this.foreColor;
+    ElectricComponent.prototype.isTurnedOn = function () {
+        return this.lightState == ESwitch.ON;
+    };
+    ElectricComponent.prototype.turnOn = function () {
+        this.lightState = ESwitch.ON;
+        this.updateComponentUI();
+    };
+    ElectricComponent.prototype.turnOff = function () {
+        this.lightState = ESwitch.OFF;
+        this.updateComponentUI();
+    };
+    ElectricComponent.prototype.pluggedIn = function (board) {
+        this.board = board;
+        this.updateSizeAndLocation();
+        this.updateComponentName();
+        this.updateComponentUI();
+    };
+    ElectricComponent.prototype.unPluggedIn = function () {
+        this.getElectricBoard().removeSubView(this);
+    };
+    ElectricComponent.prototype.updateSizeAndLocation = function () {
+        if (!this.board)
+            return;
+        this.getView().style.left = this.getElectricBoard().getGridCellSize().width * this.getColumn() + "px";
+        this.getView().style.top = this.getElectricBoard().getGridCellSize().height * this.getRow() + "px";
+        this.getView().style.width = this.getElectricBoard().getGridCellSize().getWidth() + "px";
+        this.getView().style.height = this.getElectricBoard().getGridCellSize().getHeight() + "px";
     };
     ElectricComponent.prototype.powerOn = function () {
         var imageEles = this.getView().getElementsByClassName("component_image");
@@ -74,36 +148,13 @@ var ElectricComponent = /** @class */ (function () {
             imageEles[0].src = this.getOffImage();
         }
     };
-    ElectricComponent.prototype.isTurnedOn = function () {
-        return this.lightState == ESwitch.ON;
-    };
-    ;
-    ElectricComponent.prototype.turnOn = function () {
-        this.lightState = ESwitch.ON;
-        this.updateComponentUI();
-    };
-    ElectricComponent.prototype.turnOff = function () {
-        this.lightState = ESwitch.OFF;
-        this.updateComponentUI();
-    };
-    ElectricComponent.prototype.setOnImage = function (image) {
-        this.onImage = image;
-    };
-    ElectricComponent.prototype.getOnImage = function () {
-        return this.onImage;
-    };
-    ElectricComponent.prototype.setOffImage = function (image) {
-        this.offImage = image;
-    };
-    ElectricComponent.prototype.getOffImage = function () {
-        return this.offImage;
-    };
-    ElectricComponent.prototype.getCustomRender = function () {
-        return this.customRender;
-    };
-    ElectricComponent.prototype.setCustomRender = function (renderStr) {
-        this.customRender = renderStr;
-        this.updateComponentUI();
+    ElectricComponent.prototype.showComponentName = function (display) {
+        var nameEles = this.getView().getElementsByClassName("component_name");
+        if (nameEles && nameEles.length > 0) {
+            nameEles[0].innerHTML = this.getName();
+            nameEles[0].style.color = this.getForeColor();
+            nameEles[0].style.visibility = display ? "visible" : "hidden";
+        }
     };
     /**Detect what image should show based on component status and board power state */
     ElectricComponent.prototype.updateComponentUI = function () {
@@ -147,63 +198,11 @@ var ElectricComponent = /** @class */ (function () {
         if (nameEles && nameEles.length > 0) {
             nameEles[0].innerHTML = this.getName();
             nameEles[0].style.color = this.getForeColor();
-            nameEles[0].style.visibility = this.getElectricBoard().isDisplayingComponentName() ? "visible" : "hidden";
+            nameEles[0].style.visibility = this.getElectricBoard().isShowingComponentName() ? "visible" : "hidden";
         }
     };
-    //Override
-    ElectricComponent.prototype.initialize = function (properties) {
-        if (!properties)
-            return;
-        if (ParamsKey._NAME_ in properties) {
-            this.setName(properties[ParamsKey._NAME_]);
-        }
-        if (ParamsKey._COLUMN_ in properties) {
-            this.setColumn(properties[ParamsKey._COLUMN_]);
-        }
-        if (ParamsKey._ROW_ in properties) {
-            this.setRow(properties[ParamsKey._ROW_]);
-        }
-        if (ParamsKey._FORE_COLOR_ in properties) {
-            this.setForeColor(properties[ParamsKey._FORE_COLOR_]);
-        }
-        if (ParamsKey._TURN_ON_ in properties) {
-            this.lightState = properties[ParamsKey._TURN_ON_] == 1 ? ESwitch.ON : ESwitch.OFF;
-        }
-        if (ParamsKey._ON_IMAGE_ in properties) {
-            this.setOnImage(properties[ParamsKey._ON_IMAGE_]);
-        }
-        if (ParamsKey._OFF_IMAGE_ in properties) {
-            this.setOffImage(properties[ParamsKey._OFF_IMAGE_]);
-        }
-        if (ParamsKey._CUSTOME_RENDER_ in properties) {
-            this.customRender = properties[ParamsKey._CUSTOME_RENDER_];
-        }
-    };
-    //Override
-    ElectricComponent.prototype.displayComponentName = function (display) {
-        var nameEles = this.getView().getElementsByClassName("component_name");
-        if (nameEles && nameEles.length > 0) {
-            nameEles[0].innerHTML = this.getName();
-            nameEles[0].style.color = this.getForeColor();
-            nameEles[0].style.visibility = display ? "visible" : "hidden";
-        }
-    };
-    ElectricComponent.prototype.pluggedIn = function (board) {
-        this.board = board;
-        this.updateSizeAndLocation();
-        this.updateComponentName();
-        this.updateComponentUI();
-    };
-    ElectricComponent.prototype.unPluggedIn = function () {
-        this.getElectricBoard().removeSubView(this);
-    };
-    ElectricComponent.prototype.updateSizeAndLocation = function () {
-        if (!this.board)
-            return;
-        this.getView().style.left = this.getElectricBoard().getGridCellSize().width * this.getColumn() + "px";
-        this.getView().style.top = this.getElectricBoard().getGridCellSize().height * this.getRow() + "px";
-        this.getView().style.width = this.getElectricBoard().getGridCellSize().getWidth() + "px";
-        this.getView().style.height = this.getElectricBoard().getGridCellSize().getHeight() + "px";
+    ElectricComponent.prototype.getElectricBoard = function () {
+        return this.board;
     };
     return ElectricComponent;
 }());

@@ -106,10 +106,17 @@ interface IElectricComponent extends IObjectBase, IView {
      */
     updateSizeAndLocation(): void;
 
+    /**
+     * Turn on the power of this component.
+     */
     powerOn(): void;
-    powerOff(): void;
 
-    displayComponentName(display: boolean): void;
+    /**
+     * Turn off the power of this component.
+     */
+    powerOff(): void;
+    
+    showComponentName(show: boolean): void;
 
 
 

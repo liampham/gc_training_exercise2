@@ -27,7 +27,7 @@ var BoardUIController = /** @class */ (function () {
         }
         var inputDisplayComponentName = document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
         if (inputDisplayComponentName) {
-            inputDisplayComponentName.checked = this.electricBoard.isDisplayingComponentName();
+            inputDisplayComponentName.checked = this.electricBoard.isShowingComponentName();
             inputDisplayComponentName.onchange = function () {
                 _this.onDisplayComponentNameStateChanged();
             };
@@ -82,12 +82,12 @@ var BoardUIController = /** @class */ (function () {
         }
     };
     BoardUIController.prototype.onDisplayComponentNameStateChanged = function () {
-        var displayComponentName = document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
-        if (displayComponentName) {
-            if (displayComponentName.checked)
-                this.electricBoard.displayComponentNameOn();
+        var showComponentName = document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
+        if (showComponentName) {
+            if (showComponentName.checked)
+                this.electricBoard.showComponentName();
             else
-                this.electricBoard.displayComponentNameOff();
+                this.electricBoard.hideComponentName();
         }
     };
     BoardUIController.prototype.onClickAddNewComponent = function () {
@@ -107,7 +107,7 @@ var BoardUIController = /** @class */ (function () {
                 window.alert("Cannot add new component at this location!");
                 return;
             }
-            _this.electricBoard.plugInComponent(_this.currentComponent);
+            _this.electricBoard.plugInElectricComponent(_this.currentComponent);
             _this.showComponentDetail(false);
             _this.renderComponentsList();
         };
@@ -196,11 +196,11 @@ var BoardUIController = /** @class */ (function () {
         container.innerHTML = "";
         var _loop_1 = function (ec) {
             var ecItemView = document.createElement("div");
-            ecItemView.innerHTML = "<div class=\"a1-padding a3-container a3-items-center\">        <div class=\"a3-container a3-items-center a3-flex-1 item-container\">            <img src=\"" + ec.getOnImage() + "\" style=\"width:32px; height: 32px\"                class=\"component_image\">            <div class=\"a3-flex-1 a1-padding-left\" class=\"component_name\">" + ec.getName() + "</div>        </div>        <img src=\"assets/images/trash.png\" style=\"width:24px; height: 24px\" class=\"btn_remove\"></i>    </div>";
+            ecItemView.innerHTML = "<div class=\"a1-padding a3-container a3-items-center\">        <div class=\"a3-container a3-items-center a3-flex-1 item-container cursor-pointer\">            <img src=\"" + ec.getOnImage() + "\" style=\"width:32px; height: 32px\"                class=\"component_image cursor-pointer\">            <div class=\"a3-flex-1 a1-padding-left\" class=\"component_name\">" + ec.getName() + "</div>        </div>        <img src=\"assets/images/trash.png\" style=\"width:24px; height: 24px\" class=\"btn_remove\"></i>    </div>";
             var btnRemoves = ecItemView.getElementsByClassName("btn_remove");
             if (btnRemoves.length > 0) {
                 btnRemoves[0].onclick = function () {
-                    _this.electricBoard.unPlugInComponent(ec);
+                    _this.electricBoard.unPlugInElectricComponent(ec);
                     ecItemView.remove();
                 };
             }

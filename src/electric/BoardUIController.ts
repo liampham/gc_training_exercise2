@@ -38,7 +38,7 @@ class BoardUIController {
 
         let inputDisplayComponentName = document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
         if (inputDisplayComponentName) {
-            (<HTMLInputElement>inputDisplayComponentName).checked = this.electricBoard.isDisplayingComponentName();
+            (<HTMLInputElement>inputDisplayComponentName).checked = this.electricBoard.isShowingComponentName();
             inputDisplayComponentName.onchange = () => {
                 this.onDisplayComponentNameStateChanged();
             }
@@ -101,10 +101,10 @@ class BoardUIController {
     }
 
     private onDisplayComponentNameStateChanged() {
-        let displayComponentName: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
-        if (displayComponentName) {
-            if (displayComponentName.checked) this.electricBoard.displayComponentNameOn();
-            else this.electricBoard.displayComponentNameOff();
+        let showComponentName: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
+        if (showComponentName) {
+            if (showComponentName.checked) this.electricBoard.showComponentName();
+            else this.electricBoard.hideComponentName();
         }
     }
 
@@ -127,7 +127,7 @@ class BoardUIController {
                 window.alert("Cannot add new component at this location!");
                 return;
             }
-            this.electricBoard.plugInComponent(this.currentComponent);
+            this.electricBoard.plugInElectricComponent(this.currentComponent);
             this.showComponentDetail(false);
             this.renderComponentsList();
         }
@@ -222,11 +222,11 @@ class BoardUIController {
 
         for (let ec of this.electricBoard.getElectricComponents()) {
             let ecItemView = document.createElement("div");
-            ecItemView.innerHTML = `<div class=\"a1-padding a3-container a3-items-center\">        <div class=\"a3-container a3-items-center a3-flex-1 item-container\">            <img src=\"${ec.getOnImage()}\" style=\"width:32px; height: 32px\"                class=\"component_image\">            <div class=\"a3-flex-1 a1-padding-left\" class=\"component_name\">${ec.getName()}</div>        </div>        <img src=\"assets/images/trash.png\" style=\"width:24px; height: 24px\" class=\"btn_remove\"></i>    </div>`;
+            ecItemView.innerHTML = `<div class=\"a1-padding a3-container a3-items-center\">        <div class=\"a3-container a3-items-center a3-flex-1 item-container cursor-pointer\">            <img src=\"${ec.getOnImage()}\" style=\"width:32px; height: 32px\"                class=\"component_image cursor-pointer\">            <div class=\"a3-flex-1 a1-padding-left\" class=\"component_name\">${ec.getName()}</div>        </div>        <img src=\"assets/images/trash.png\" style=\"width:24px; height: 24px\" class=\"btn_remove\"></i>    </div>`;
             let btnRemoves = ecItemView.getElementsByClassName("btn_remove");
             if (btnRemoves.length > 0) {
                 (<HTMLElement>btnRemoves[0]).onclick = () => {
-                    this.electricBoard.unPlugInComponent(ec);
+                    this.electricBoard.unPlugInElectricComponent(ec);
                     ecItemView.remove();
                 }
             }

@@ -3,17 +3,17 @@ interface IElectricBoard extends IView {
     /**
      * true : Board is displaying component's name
      */
-    isDisplayingComponentName(): boolean;
+    isShowingComponentName(): boolean;
 
     /**
      * Show components name.
      */
-    displayComponentNameOn(): void;
+    showComponentName(): void;
 
     /**
      * Hidden components name.
      */
-    displayComponentNameOff(): void;
+    hideComponentName(): void;
 
     /**
      * Ask to know whether the board power is on or not.
@@ -81,11 +81,11 @@ interface IElectricBoard extends IView {
      * Attact new component to the board.
      * @param electricComponent : Component to add
      */
-    plugInComponent(electricComponent: IElectricComponent): void;
+    plugInElectricComponent(electricComponent: IElectricComponent): void;
     /**
     * Un plugin a component from board.
     * @param electricComponent : Component to remove.
     */
-    unPlugInComponent(electricComponent: IElectricComponent): void;
+    unPlugInElectricComponent(electricComponent: IElectricComponent): void;
 
 }

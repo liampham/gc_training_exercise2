@@ -88,3 +88,7 @@ body{
   .btn:hover {
     background-color: rgba(6, 56, 255, 0.836);
   }
+
+  .cursor-pointer{
+    cursor: pointer;
+  }
