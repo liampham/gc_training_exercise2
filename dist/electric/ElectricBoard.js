@@ -9,68 +9,155 @@ var ElectricBoard = /** @class */ (function () {
         this.electricComponents = [];
         this.gridCellSize = new Size();
         this.boardElementID = boardElementID;
+        this.view = document.getElementById(boardElementID);
     }
-    ElectricBoard.prototype.setGridRow = function (gridRow) { this.gridRow = gridRow; };
-    ElectricBoard.prototype.setGridColumn = function (gridColumn) { this.gridColumn = gridColumn; };
-    ElectricBoard.prototype.getGridRow = function () { return this.gridRow; };
-    ElectricBoard.prototype.getGridColumn = function () { return this.gridColumn; };
-    ElectricBoard.prototype.setBackgroundColor = function (backgroundColor) { this.backgroundColor = backgroundColor; };
-    ElectricBoard.prototype.getBackgroundColor = function () { return this.backgroundColor; };
-    ElectricBoard.prototype.setDisplayComponentNameState = function (displayComponentState) { this.displayComponentNameState = displayComponentState; };
-    ElectricBoard.prototype.getDisplayComponentNameState = function () { return this.displayComponentNameState; };
-    ElectricBoard.prototype.setPowerState = function (powerState) { this.powerState = powerState; };
-    ElectricBoard.prototype.getPowerState = function () { return this.powerState; };
-    ElectricBoard.prototype.setGridCellSize = function (size) { this.gridCellSize = size; };
-    ElectricBoard.prototype.getGridCellSize = function () { return this.gridCellSize; };
-    ElectricBoard.prototype.addElectricComponent = function (component, ignoreWhenCellIsFilled) {
-        if (ignoreWhenCellIsFilled === void 0) { ignoreWhenCellIsFilled = true; }
-        if (!ignoreWhenCellIsFilled) {
-            var found = this.electricComponents.find(function (ec) {
-                return ec.getPosition().getX() == component.getPosition().getX() && ec.getPosition().getY() == component.getPosition().getY();
-            });
-            if (found)
-                return;
+    ElectricBoard.prototype.initialize = function (properties) {
+        if (!properties)
+            return;
+        if (ParamsKey._POWER_STATE_ in properties) {
+            this.powerState = properties[ParamsKey._POWER_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF;
         }
-        this.electricComponents.push(component);
+        if (ParamsKey._DISPLAY_COMPONENT_NAME_ in properties) {
+            this.displayComponentNameState = properties[ParamsKey._DISPLAY_COMPONENT_NAME_] == 1 ? ESwitch.ON : ESwitch.OFF;
+        }
+        if (ParamsKey._GRID_ROW_ in properties) {
+            this.gridRow = properties[ParamsKey._GRID_ROW_];
+        }
+        if (ParamsKey._GRID_COLUMN_ in properties) {
+            this.gridColumn = properties[ParamsKey._GRID_COLUMN_];
+        }
+        if (ParamsKey._BACKGROUND_COLOR_ in properties) {
+            this.backgroundColor = properties[ParamsKey._BACKGROUND_COLOR_];
+        }
+        this.drawGrid();
+        if (ParamsKey._ELECTRIC_COMPONENTS_ in properties) {
+            var componentDatas = properties[ParamsKey._ELECTRIC_COMPONENTS_];
+            if (componentDatas) {
+                for (var _i = 0, componentDatas_1 = componentDatas; _i < componentDatas_1.length; _i++) {
+                    var componentProperties = componentDatas_1[_i];
+                    var electricComponent = new ElectricComponent();
+                    electricComponent.initialize(componentProperties);
+                    this.plugInComponent(electricComponent);
+                }
+            }
+        }
     };
-    ElectricBoard.prototype.removeElectricComponent = function (component) {
-        var index = this.electricComponents.indexOf(component);
-        if (index != -1) {
-            this.electricComponents[index].getView().remove();
-            this.electricComponents.splice(index, 1);
+    ElectricBoard.prototype.isDisplayingComponentName = function () {
+        return this.displayComponentNameState == ESwitch.ON;
+    };
+    ElectricBoard.prototype.displayComponentNameOn = function () {
+        this.displayComponentNameState = ESwitch.ON;
+        for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
+            var ec = _a[_i];
+            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
         }
+    };
+    ElectricBoard.prototype.displayComponentNameOff = function () {
+        this.displayComponentNameState = ESwitch.OFF;
+        for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
+            var ec = _a[_i];
+            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
+        }
+    };
+    ElectricBoard.prototype.isPowerOn = function () {
+        return this.powerState == ESwitch.ON;
+    };
+    ElectricBoard.prototype.powerOn = function () {
+        this.powerState = ESwitch.ON;
+        for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
+            var ec = _a[_i];
+            ec.powerOn();
+        }
+    };
+    ElectricBoard.prototype.powerOff = function () {
+        this.powerState = ESwitch.OFF;
+        for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
+            var ec = _a[_i];
+            ec.powerOff();
+        }
+    };
+    ElectricBoard.prototype.getGridCellSize = function () {
+        return this.gridCellSize;
+    };
+    ElectricBoard.prototype.setGridRow = function (gridRow) {
+        this.gridRow = gridRow;
+        this.drawGrid();
+        for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
+            var ec = _a[_i];
+            ec.updateSizeAndLocation();
+        }
+    };
+    ElectricBoard.prototype.setGridColumn = function (gridColumn) {
+        this.gridColumn = gridColumn;
+        this.drawGrid();
+        for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
+            var ec = _a[_i];
+            ec.updateSizeAndLocation();
+        }
+    };
+    ElectricBoard.prototype.getGridColumn = function () {
+        return this.gridColumn;
+    };
+    ElectricBoard.prototype.getGridRow = function () {
+        return this.gridRow;
+    };
+    ElectricBoard.prototype.setBackgroundColor = function (color) {
+        this.backgroundColor = color;
+        var svgEles = this.getView().getElementsByClassName("board-grid");
+        if (svgEles && svgEles.length > 0) {
+            svgEles[0].style.backgroundColor = this.getBackgroundColor();
+        }
+    };
+    ElectricBoard.prototype.getBackgroundColor = function () {
+        return this.backgroundColor;
     };
     ElectricBoard.prototype.getElectricComponents = function () {
         return this.electricComponents;
     };
-    ElectricBoard.prototype.render = function () {
-        if (!this.boardElementID || this.boardElementID.length == 0)
-            return;
-        var container = document.getElementById(this.boardElementID);
-        if (!container)
-            return;
-        container.innerHTML = "";
-        this.getGridCellSize().set(Math.floor(container.clientWidth / this.getGridColumn()), Math.floor(container.clientHeight / this.getGridRow()));
-        this.drawGrid(container);
-        for (var _i = 0, _a = this.electricComponents; _i < _a.length; _i++) {
-            var ec = _a[_i];
-            var view = ec.getView();
-            ec.render(this);
-            container.appendChild(view);
-        }
+    ElectricBoard.prototype.getElectricComponentAtLocation = function (col, row) {
+        return this.electricComponents.find(function (ec) {
+            return col == ec.getColumn() && row == ec.getRow();
+        });
     };
-    ElectricBoard.prototype.drawGrid = function (container) {
-        if (!container)
+    ElectricBoard.prototype.plugInComponent = function (ec) {
+        this.electricComponents.push(ec);
+        ec.pluggedIn(this);
+        this.addSubView(ec);
+    };
+    ElectricBoard.prototype.unPlugInComponent = function (ec) {
+        var index = this.electricComponents.indexOf(ec);
+        if (index == -1)
             return;
-        var width = container.clientWidth;
-        var height = container.clientHeight;
+        this.electricComponents[index].unPluggedIn();
+        this.electricComponents.splice(index, 1);
+    };
+    ElectricBoard.prototype.getView = function () {
+        if (this.view == null)
+            this.view = document.createElement("div");
+        return this.view;
+    };
+    ElectricBoard.prototype.setView = function (view) {
+        this.view = view;
+    };
+    ElectricBoard.prototype.addSubView = function (view) {
+        this.view.appendChild(view.getView());
+    };
+    ElectricBoard.prototype.removeSubView = function (view) {
+        this.view.removeChild(view.getView());
+    };
+    ElectricBoard.prototype.drawGrid = function () {
+        // remove current grid
+        var grids = this.getView().getElementsByClassName("board-grid");
+        for (var i = 0; i < grids.length; i++) {
+            grids.item(i).remove();
+        }
+        var width = this.getView().clientWidth;
+        var height = this.getView().clientHeight;
+        this.getGridCellSize().set(Math.floor(width / this.getGridColumn()), Math.floor(height / this.getGridRow()));
         var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.style.width = width + "px";
-        svg.style.height = height + "px";
-        svg.style.left = "0";
-        svg.style.top = "0";
-        svg.style.position = "absolute";
         svg.style.backgroundColor = this.getBackgroundColor();
+        svg.classList.add("a1-container-absolute");
+        svg.classList.add("board-grid");
         for (var i = 0; i < this.gridRow; i++) {
             var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
             line.setAttribute("x1", "0");
@@ -91,59 +178,7 @@ var ElectricBoard = /** @class */ (function () {
             line.setAttribute("stroke", "lightgray");
             svg.appendChild(line);
         }
-        container.appendChild(svg);
-    };
-    //Override
-    ElectricBoard.prototype.initialize = function (properties) {
-        if (!properties)
-            return;
-        if (ParamsKey._POWER_STATE_ in properties) {
-            this.setPowerState(properties[ParamsKey._POWER_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF);
-        }
-        if (ParamsKey._DISPLAY_COMPONENT_NAME_ in properties) {
-            this.setDisplayComponentNameState(properties[ParamsKey._DISPLAY_COMPONENT_NAME_] == 1 ? ESwitch.ON : ESwitch.OFF);
-        }
-        if (ParamsKey._GRID_ROW_ in properties) {
-            this.setGridRow(properties[ParamsKey._GRID_ROW_]);
-        }
-        if (ParamsKey._GRID_COLUMN_ in properties) {
-            this.setGridColumn(properties[ParamsKey._GRID_COLUMN_]);
-        }
-        if (ParamsKey._BACKGROUND_COLOR_ in properties) {
-            this.setBackgroundColor(properties[ParamsKey._BACKGROUND_COLOR_]);
-        }
-        if (ParamsKey._ELECTRIC_COMPONENTS_ in properties) {
-            var componentDatas = properties[ParamsKey._ELECTRIC_COMPONENTS_];
-            if (componentDatas) {
-                for (var _i = 0, componentDatas_1 = componentDatas; _i < componentDatas_1.length; _i++) {
-                    var componentProperties = componentDatas_1[_i];
-                    var electricComponent = new CommonElectricComponent();
-                    electricComponent.initialize(componentProperties);
-                    this.addElectricComponent(electricComponent);
-                }
-            }
-        }
-    };
-    ElectricBoard.prototype.changeBackgroundColor = function () {
-        if (!this.boardElementID || this.boardElementID.length == 0)
-            return;
-        var container = document.getElementById(this.boardElementID);
-        if (!container)
-            return;
-        var svgEles = container.getElementsByTagName("svg");
-        if (svgEles && svgEles.length > 0) {
-            svgEles[0].style.backgroundColor = this.getBackgroundColor();
-        }
-    };
-    ElectricBoard.prototype.pluggedInNewComponent = function (electricComponent) {
-        this.addElectricComponent(electricComponent);
-        if (!this.boardElementID || this.boardElementID.length == 0)
-            return;
-        var container = document.getElementById(this.boardElementID);
-        if (!container)
-            return;
-        electricComponent.render(this);
-        container.appendChild(electricComponent.getView());
+        this.getView().insertBefore(svg, this.getView().firstChild);
     };
     return ElectricBoard;
 }());

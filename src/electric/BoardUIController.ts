@@ -8,15 +8,10 @@ class BoardUIController {
         this.electricBoard = board;
         this.initializeInputHandlers();
         this.renderComponentsList();
+        
     }
-
+  
     private initializeInputHandlers() {
-        let btnApplyBoardConfiguration = document.getElementById(R.BTN_APPLY_BOARD_CONFIGURATION);
-        if (btnApplyBoardConfiguration) {
-            btnApplyBoardConfiguration.onclick = () => {
-                this.updateBoardConfigurations();
-            }
-        }
 
         let btnCloseComponentDetailView = document.getElementById(R.BTN_CLOSE_COMPONENT_DETAIL);
         if (btnCloseComponentDetailView) {
@@ -35,13 +30,15 @@ class BoardUIController {
 
         let inputBoardPowerSwitch = document.getElementById(R.INPUT_BOARD_POWER_SWITCH);
         if (inputBoardPowerSwitch) {
+            (<HTMLInputElement>inputBoardPowerSwitch).checked = this.electricBoard.isPowerOn();
             inputBoardPowerSwitch.onchange = () => {
-                this.onPowerStateChanged();
+                this.onBoardPowerStateChanged();
             }
         }
 
         let inputDisplayComponentName = document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
         if (inputDisplayComponentName) {
+            (<HTMLInputElement>inputDisplayComponentName).checked = this.electricBoard.isDisplayingComponentName();
             inputDisplayComponentName.onchange = () => {
                 this.onDisplayComponentNameStateChanged();
             }
@@ -50,60 +47,93 @@ class BoardUIController {
 
         let inputBoardBackgroundColor = document.getElementById(R.INPUT_BOARD_BACKGROUND_COLOR);
         if (inputBoardBackgroundColor) {
+            (<HTMLInputElement>inputBoardBackgroundColor).value = this.electricBoard.getBackgroundColor();
             inputBoardBackgroundColor.onchange = () => {
                 this.onBoardBackgroundColorChanged();
             }
         }
 
+        let inputBoardGridColumn = document.getElementById(R.INPUT_BOARD_GRID_COLUMN);
+        if (inputBoardGridColumn) {
+            (<HTMLInputElement>inputBoardGridColumn).value = this.electricBoard.getGridColumn()+"";
+            inputBoardGridColumn.onchange = () => {
+                this.onBoardGridColumnChanged();
+            }
+        }
 
-
+        let inputBoardGridRow = document.getElementById(R.INPUT_BOARD_GRID_ROW);
+        if (inputBoardGridRow) {
+            (<HTMLInputElement>inputBoardGridRow).value = this.electricBoard.getGridRow()+"";
+            inputBoardGridRow.onchange = () => {
+                this.onBoardGridRowChanged();
+            }
+        }
 
     }
+
+    private onBoardGridColumnChanged() {
+        let inputBoardGridColumn: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_GRID_COLUMN);
+        if (inputBoardGridColumn) {
+            this.electricBoard.setGridColumn(parseInt(inputBoardGridColumn.value));
+        }
+    }
+
+    private onBoardGridRowChanged() {
+        let inputBoardGridRow: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_GRID_ROW);
+        if (inputBoardGridRow) {
+            this.electricBoard.setGridRow(parseInt(inputBoardGridRow.value));
+        }
+    }
+
     private onBoardBackgroundColorChanged() {
         let backgroundColorElement: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_BACKGROUND_COLOR);
         if (backgroundColorElement) {
             this.electricBoard.setBackgroundColor(backgroundColorElement.value);
-            this.electricBoard.changeBackgroundColor();
         }
     }
 
-    private onPowerStateChanged() {
+    private onBoardPowerStateChanged() {
         let powerSwitchElement: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_POWER_SWITCH);
         if (powerSwitchElement) {
-            this.electricBoard.setPowerState(powerSwitchElement.checked ? ESwitch.ON : ESwitch.OFF);
-            for (let ec of this.electricBoard.getElectricComponents()) {
-                ec.onBoardPowerStateChanged(this.electricBoard.getPowerState());
-            }
+            if (powerSwitchElement.checked) this.electricBoard.powerOn();
+            else this.electricBoard.powerOff();
         }
     }
 
     private onDisplayComponentNameStateChanged() {
         let displayComponentName: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
         if (displayComponentName) {
-            this.electricBoard.setDisplayComponentNameState(displayComponentName.checked ? ESwitch.ON : ESwitch.OFF);
-            for (let ec of this.electricBoard.getElectricComponents()) {
-                ec.displayComponentName(displayComponentName.checked);
-            }
+            if (displayComponentName.checked) this.electricBoard.displayComponentNameOn();
+            else this.electricBoard.displayComponentNameOff();
         }
-
     }
 
-    public onClickAddNewComponent() {
-        this.currentComponent = new CommonElectricComponent();
-        this.currentComponent.getPosition().set(240,240);
+    private onClickAddNewComponent() {
+        this.currentComponent = new ElectricComponent();
+        this.currentComponent.setColumn(Math.floor(this.electricBoard.getGridColumn() / 2))
+        this.currentComponent.setRow(Math.floor(this.electricBoard.getGridRow() / 2))
+
         this.showComponentDetail(true);
         document.getElementById(R.COMPONENT_NAME).innerText = "Add new component";
 
         (<HTMLElement>document.getElementById(R.BTN_SUBMIT_COMPONENT)).style.visibility = "visible";
 
-        (<HTMLElement>document.getElementById(R.BTN_SUBMIT_COMPONENT)).onclick = ()=>{
-            if(Utils.isEmptyString(this.currentComponent.getName())) return;
-            this.electricBoard.pluggedInNewComponent(this.currentComponent);
+        (<HTMLElement>document.getElementById(R.BTN_SUBMIT_COMPONENT)).onclick = () => {
+            if (Utils.isEmptyString(this.currentComponent.getName())) {
+                window.alert("Component's name empty is not allow!");
+                return;
+            }
+            if (this.electricBoard.getElectricComponentAtLocation(this.currentComponent.getColumn(), this.currentComponent.getRow())) {
+                window.alert("Cannot add new component at this location!");
+                return;
+            }
+            this.electricBoard.plugInComponent(this.currentComponent);
             this.showComponentDetail(false);
             this.renderComponentsList();
         }
     }
-    public showComponentDetail(show: boolean) {
+
+    private showComponentDetail(show: boolean) {
         let listComponentContainer = document.getElementById(R.LIST_COMPONENTS_CONTAINER);
         if (listComponentContainer) { listComponentContainer.style.display = show ? "none" : "block"; }
         let componentDetailContainer = document.getElementById(R.COMPONENT_DETAIL_CONTAINER);
@@ -117,15 +147,19 @@ class BoardUIController {
             let componentNameElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_NAME);
             componentNameElement.value = this.currentComponent.getName();
             componentNameElement.onchange = () => {
-                this.currentComponent.changeComponentName(componentNameElement.value);
+                this.currentComponent.setName(componentNameElement.value);
             }
         }
 
         {
             let componentPowerStateElement = (<HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_POWER_STATE));
-            componentPowerStateElement.checked = this.currentComponent.getPluggedInState() == ESwitch.ON ? true : false;
+            componentPowerStateElement.checked = this.currentComponent.isTurnedOn();
             componentPowerStateElement.onchange = () => {
-                this.currentComponent.changePluggedInState(componentPowerStateElement.checked ? 1 : 0, this.electricBoard.getPowerState());
+                if (componentPowerStateElement.checked) {
+                    this.currentComponent.turnOn();
+                } else {
+                    this.currentComponent.turnOff();
+                }
             }
         }
 
@@ -133,7 +167,7 @@ class BoardUIController {
             let componentForeColorElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_FORECOLOR);
             componentForeColorElement.value = this.currentComponent.getForeColor();
             componentForeColorElement.onchange = () => {
-                this.currentComponent.changeComponentForeColor(componentForeColorElement.value);
+                this.currentComponent.setForeColor(componentForeColorElement.value);
             }
         }
 
@@ -142,7 +176,6 @@ class BoardUIController {
             componentOnImageElement.value = this.currentComponent.getOnImage();
             componentOnImageElement.onchange = () => {
                 this.currentComponent.setOnImage(componentOnImageElement.value);
-                this.currentComponent.onBoardPowerStateChanged(this.electricBoard.getPowerState());
             }
         }
         {
@@ -150,25 +183,22 @@ class BoardUIController {
             componentOffImageElement.value = this.currentComponent.getOffImage();
             componentOffImageElement.onchange = () => {
                 this.currentComponent.setOffImage(componentOffImageElement.value);
-                this.currentComponent.onBoardPowerStateChanged(this.electricBoard.getPowerState());
             }
         }
 
         {
             let componentPositionXElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_POSITION_X);
-            componentPositionXElement.value = this.currentComponent.getPosition().getX() + "";
+            componentPositionXElement.value = this.currentComponent.getColumn() + "";
             componentPositionXElement.onchange = () => {
-                this.currentComponent.getPosition().setX(parseInt(componentPositionXElement.value));
-                this.currentComponent.getView().style.left = `${this.currentComponent.getPosition().getX()}px`;
+                this.currentComponent.setColumn(parseInt(componentPositionXElement.value));
             }
         }
 
         {
             let componentPositionYElement = <HTMLInputElement>document.getElementById(R.INPUT_COMPONENT_POSITION_Y);
-            componentPositionYElement.value = this.currentComponent.getPosition().getY() + "";
+            componentPositionYElement.value = this.currentComponent.getRow() + "";
             componentPositionYElement.onchange = () => {
-                this.currentComponent.getPosition().setY(parseInt(componentPositionYElement.value));
-                this.currentComponent.getView().style.top = `${this.currentComponent.getPosition().getY()}px`;
+                this.currentComponent.setRow(parseInt(componentPositionYElement.value));
             }
         }
 
@@ -177,44 +207,11 @@ class BoardUIController {
             customRenderComponent.value = this.currentComponent.getCustomRender();
             customRenderComponent.onchange = () => {
                 this.currentComponent.setCustomRender(customRenderComponent.value.trim());
-                this.currentComponent.onBoardPowerStateChanged(this.electricBoard.getPowerState());
-
             }
         }
 
         (<HTMLElement>document.getElementById(R.BTN_SUBMIT_COMPONENT)).style.visibility = "hidden";
 
-    }
-
-    public updateBoardConfigurations(): void {
-
-        let displayComponentName: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_DISPLAY_COMPONENT_NAME);
-        if (displayComponentName) {
-            this.electricBoard.setDisplayComponentNameState(displayComponentName.checked ? ESwitch.ON : ESwitch.OFF);
-        }
-
-        let powerSwitchElement: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_POWER_SWITCH);
-        if (powerSwitchElement) {
-            Log.o(powerSwitchElement.checked);
-            this.electricBoard.setPowerState(powerSwitchElement.checked ? ESwitch.ON : ESwitch.OFF);
-        }
-
-        let gridRowElement: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_GRID_ROW);
-        if (gridRowElement) {
-            this.electricBoard.setGridRow(parseInt(gridRowElement.value));
-        }
-
-        let gridColumnElement: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_GRID_COLUMN);
-        if (gridColumnElement) {
-            this.electricBoard.setGridColumn(parseInt(gridColumnElement.value));
-        }
-
-        let backgroundColorElement: HTMLInputElement = <HTMLInputElement>document.getElementById(R.INPUT_BOARD_BACKGROUND_COLOR);
-        if (backgroundColorElement) {
-            this.electricBoard.setBackgroundColor(backgroundColorElement.value);
-        }
-
-        this.electricBoard.render();
     }
 
     private renderComponentsList() {
@@ -225,17 +222,14 @@ class BoardUIController {
 
         for (let ec of this.electricBoard.getElectricComponents()) {
             let ecItemView = document.createElement("div");
-
             ecItemView.innerHTML = `<div class=\"a1-padding a3-container a3-items-center\">        <div class=\"a3-container a3-items-center a3-flex-1 item-container\">            <img src=\"${ec.getOnImage()}\" style=\"width:32px; height: 32px\"                class=\"component_image\">            <div class=\"a3-flex-1 a1-padding-left\" class=\"component_name\">${ec.getName()}</div>        </div>        <img src=\"assets/images/trash.png\" style=\"width:24px; height: 24px\" class=\"btn_remove\"></i>    </div>`;
-
             let btnRemoves = ecItemView.getElementsByClassName("btn_remove");
             if (btnRemoves.length > 0) {
                 (<HTMLElement>btnRemoves[0]).onclick = () => {
+                    this.electricBoard.unPlugInComponent(ec);
                     ecItemView.remove();
-                    this.electricBoard.removeElectricComponent(ec);
                 }
             }
-
             let itemContainers = ecItemView.getElementsByClassName("item-container");
             if (itemContainers.length > 0) {
                 (<HTMLElement>itemContainers[0]).onclick = () => {

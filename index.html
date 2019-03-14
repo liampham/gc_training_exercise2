@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <script src="./dist/base/Cell.js"></script>
     <script src="./dist/base/ESwitch.js"></script>
     <script src="./dist/base/IObjectBase.js"></script>
     <script src="./dist/base/IView.js"></script>
@@ -17,13 +18,11 @@
     <script src="./dist/constants/ParamsKey.js"></script>
     <script src="./dist/constants/R.js"></script>
 
-    <script src="./dist/electric/AElectricComponent.js"></script>
+    <script src="./dist/electric/ElectricComponent.js"></script>
     <script src="./dist/electric/BoardUIController.js"></script>
-    <script src="./dist/electric/CommonElectricComponent.js"></script>
     <script src="./dist/electric/ElectricBoard.js"></script>
     <script src="./dist/electric/IElectricBoard.js"></script>
     <script src="./dist/electric/IElectricComponent.js"></script>
-    <script src="./dist/electric/IElectricComponentView.js"></script>
 
 
     <link rel="stylesheet" href="./assets/css/style.css">
@@ -85,13 +84,14 @@
                     </div>
 
                     <div class="a1-padding a1-text-center">
-                        <button id="btn_apply_board_configuration" class="primary_button">Apply</button>
-                    </div>
+                        <!-- <button id="btn_apply_board_configuration" class="primary_button">Apply</button> -->
+                    </div> 
 
                     <hr>
 
 
                     <div id="list_components_container">
+                        <h2>Electric Components</h2>
                         <div id="components_container">
 
                         </div>
@@ -120,7 +120,7 @@
                         </div>
 
                         <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
-                            <div>Plugged In</div>
+                            <div>Turn On</div>
                             <label class="switch">
                                 <input id="input_component_power_state" type="checkbox" checked>
                                 <span class="slider round"></span>
@@ -133,12 +133,12 @@
                         </div>
 
                         <div class="a3-container a3-items-center a3-justify-between a1-margin-top">
-                            <div>Position X(px)</div>
+                            <div>Column</div>
                             <input id="input_component_position_x" type="number" class="user_input" min="0" max="480">
                         </div>
 
                         <div class="a3-container a3-items-center a3-justify-between  a1-margin-top">
-                            <div>Position Y(px)</div>
+                            <div>Row</div>
                             <input id="input_component_position_y" type="number" class="user_input" min="0" max="480">
                         </div>
 
@@ -177,50 +177,43 @@
     window.onload = function () {
         var board = new ElectricBoard("board_container_id");
         board.initialize({
-            "grid_column": 6,
-            "grid_row": 6,
-            "power_state": 1,
-            "display_component_name": 1,
+            "grid_column":8,
+            "grid_row": 8,
+            "power_state": 0,
+            "display_component_name": 0,
             "background_color": "#eeffed",
             "electric_components": [
                 {
                     "name": "TV",
-                    "position": {
-                        "x": 80,
-                        "y": 80
-                    },
+                    "column": 2,
+                    "row" :3,
                     "on_image": "./assets/images/tv_on.png",
                     "off_image": "./assets/images/tv_off.png",
-                    "plugged_in_state": 0
+                    "turn_on": 0
                 },
                 {
                     "name": "Lamp",
                     "fore_color": "red",
-                    "position": {
-                        "x": 240,
-                        "y": 320
-                    },
+                    "column": 1,
+                    "row" :4,
                     "on_image": "./assets/images/lamp_on.png",
                     "off_image": "./assets/images/lamp_off.png",
-                    "plugged_in_state": 1
+                    "turn_on": 1
                 },
             
                 {
                     "name": "HTML",
                     "fore_color": "green",
-                    "position": {
-                        "x": 80,
-                        "y": 240
-                    },
+                    "column": 4,
+                    "row" :2,
                     "on_image": "./assets/images/lamp_on.png",
                     "off_image": "./assets/images/lamp_off.png",
-                    "plugged_in_state": 1,
+                    "turn_on": 1,
                     "custom_render": "<div style=\"display:inline-block; width:16px; height:16px; border-radius:100px; background-color:green; position:absolute; top:50%; left : 50%; transform : translate(-50%,-50%)\"></div>"
                 }
             ]
         });
-        board.render();
-
+       
         var boarUIController = new BoardUIController(board);
 
     }

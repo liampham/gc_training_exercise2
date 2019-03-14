@@ -1,7 +1,7 @@
 var R = /** @class */ (function () {
     function R() {
     }
-    R.BTN_APPLY_BOARD_CONFIGURATION = "btn_apply_board_configuration";
+    //public static BTN_APPLY_BOARD_CONFIGURATION: string = "btn_apply_board_configuration";
     R.BTN_CLOSE_COMPONENT_DETAIL = "btn_close_component_detail";
     R.BTN_ADD_COMPONENT = "btn_add_component";
     R.BTN_SUBMIT_COMPONENT = "btn_submit_component";

@@ -1,93 +1,145 @@
 class ElectricBoard implements IElectricBoard, IObjectBase {
+    protected boardElementID: string = "";
+    private powerState: ESwitch = ESwitch.ON;
+    private displayComponentNameState: ESwitch = ESwitch.ON;
+    private gridRow: number = 6;
+    private gridColumn: number = 6;
+    private backgroundColor: string = "white";
+    private electricComponents: Array<IElectricComponent> = [];
+    private gridCellSize: Size = new Size();
 
-
-    public boardElementID: string = "";
-    public powerState: ESwitch = ESwitch.ON;
-    public displayComponentNameState: ESwitch = ESwitch.ON;
-    public gridRow: number = 6;
-    public gridColumn: number = 6;
-    public backgroundColor: string = "white";
-    public electricComponents: Array<IElectricComponent> = [];
-    public gridCellSize: Size = new Size();
+    private view: HTMLElement;
 
     constructor(boardElementID: string) {
         this.boardElementID = boardElementID;
+        this.view = document.getElementById(boardElementID);
     }
 
-    public setGridRow(gridRow: number): void { this.gridRow = gridRow; }
-    public setGridColumn(gridColumn: number): void { this.gridColumn = gridColumn; }
-
-    public getGridRow(): number { return this.gridRow; }
-    public getGridColumn(): number { return this.gridColumn; }
-
-    public setBackgroundColor(backgroundColor: string): void { this.backgroundColor = backgroundColor; }
-    public getBackgroundColor(): string { return this.backgroundColor; }
-
-    public setDisplayComponentNameState(displayComponentState: ESwitch): void { this.displayComponentNameState = displayComponentState; }
-    public getDisplayComponentNameState(): ESwitch { return this.displayComponentNameState; }
-
-    public setPowerState(powerState: ESwitch) { this.powerState = powerState; }
-    public getPowerState(): ESwitch { return this.powerState; }
-
-    public setGridCellSize(size: Size): void { this.gridCellSize = size; }
-    public getGridCellSize(): Size { return this.gridCellSize; }
-
-    public addElectricComponent(component: IElectricComponent, ignoreWhenCellIsFilled: boolean = true): void {
-        if (!ignoreWhenCellIsFilled) {
-            let found = this.electricComponents.find(ec => {
-                return ec.getPosition().getX() == component.getPosition().getX() && ec.getPosition().getY() == component.getPosition().getY();
-            });
-            if (found) return;
-        }
-        this.electricComponents.push(component);
-    }
-
-    public removeElectricComponent(component: IElectricComponent): void {
-        let index: number = this.electricComponents.indexOf(component);
-        if (index != -1) {
-            this.electricComponents[index].getView().remove();
-            this.electricComponents.splice(index, 1);
+    initialize(properties: object): void {
+        if (!properties) return;
+        if (ParamsKey._POWER_STATE_ in properties) { this.powerState = properties[ParamsKey._POWER_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF; }
+        if (ParamsKey._DISPLAY_COMPONENT_NAME_ in properties) { this.displayComponentNameState = properties[ParamsKey._DISPLAY_COMPONENT_NAME_] == 1 ? ESwitch.ON : ESwitch.OFF; }
+        if (ParamsKey._GRID_ROW_ in properties) { this.gridRow = properties[ParamsKey._GRID_ROW_]; }
+        if (ParamsKey._GRID_COLUMN_ in properties) { this.gridColumn = properties[ParamsKey._GRID_COLUMN_]; }
+        if (ParamsKey._BACKGROUND_COLOR_ in properties) { this.backgroundColor = properties[ParamsKey._BACKGROUND_COLOR_]; }
+        this.drawGrid();
+        if (ParamsKey._ELECTRIC_COMPONENTS_ in properties) {
+            let componentDatas = properties[ParamsKey._ELECTRIC_COMPONENTS_];
+            if (componentDatas) {
+                for (let componentProperties of componentDatas) {
+                    let electricComponent: IElectricComponent = new ElectricComponent();
+                    electricComponent.initialize(componentProperties);
+                    this.plugInComponent(electricComponent);
+                }
+            }
         }
     }
-
-    public getElectricComponents(): Array<IElectricComponent> {
+    isDisplayingComponentName(): boolean {
+        return this.displayComponentNameState == ESwitch.ON;
+    }
+    displayComponentNameOn(): void {
+        this.displayComponentNameState = ESwitch.ON;
+        for (let ec of this.electricComponents) {
+            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
+        }
+    }
+    displayComponentNameOff(): void {
+        this.displayComponentNameState = ESwitch.OFF;
+        for (let ec of this.electricComponents) {
+            ec.displayComponentName(this.isDisplayingComponentName() ? true : false);
+        }
+    }
+    isPowerOn(): boolean {
+        return this.powerState == ESwitch.ON;
+    }
+    powerOn(): void {
+        this.powerState = ESwitch.ON;
+        for (let ec of this.electricComponents) {
+            ec.powerOn();
+        }
+    }
+    powerOff(): void {
+        this.powerState = ESwitch.OFF;
+        for (let ec of this.electricComponents) {
+            ec.powerOff();
+        }
+    }
+    getGridCellSize(): Size {
+        return this.gridCellSize;
+    }
+    setGridRow(gridRow: number): void {
+        this.gridRow = gridRow;
+        this.drawGrid();
+        for (let ec of this.electricComponents) ec.updateSizeAndLocation();
+    }
+    setGridColumn(gridColumn: number): void {
+        this.gridColumn = gridColumn;
+        this.drawGrid();
+        for (let ec of this.electricComponents) ec.updateSizeAndLocation();
+    }
+    getGridColumn(): number {
+        return this.gridColumn;
+    }
+    getGridRow(): number {
+        return this.gridRow;
+    }
+    setBackgroundColor(color: string): void {
+        this.backgroundColor = color;
+        let svgEles = this.getView().getElementsByClassName("board-grid");
+        if (svgEles && svgEles.length > 0) {
+            (<HTMLElement>svgEles[0]).style.backgroundColor = this.getBackgroundColor();
+        }
+    }
+    getBackgroundColor(): string {
+        return this.backgroundColor;
+    }
+    getElectricComponents(): IElectricComponent[] {
         return this.electricComponents;
     }
+    getElectricComponentAtLocation(col: number, row: number): IElectricComponent {
+        return this.electricComponents.find(ec => {
+            return col == ec.getColumn() && row == ec.getRow();
+        });
+    }
+    plugInComponent(ec: IElectricComponent): void {
+        this.electricComponents.push(ec);
+        ec.pluggedIn(this);
+        this.addSubView(ec);
+    }
+    unPlugInComponent(ec: IElectricComponent): void {
+        let index: number = this.electricComponents.indexOf(ec);
+        if (index == -1) return;
 
-
-    public render(): void {
-        if (!this.boardElementID || this.boardElementID.length == 0) return;
-
-        let container = document.getElementById(this.boardElementID);
-        if (!container) return;
-
-        container.innerHTML = "";
-
-        this.getGridCellSize().set(Math.floor(container.clientWidth / this.getGridColumn()), Math.floor(container.clientHeight / this.getGridRow()));
-
-        this.drawGrid(container);
-
-        for (let ec of this.electricComponents) {
-            let view = ec.getView();
-            ec.render(this);
-            container.appendChild(view);
+        this.electricComponents[index].unPluggedIn();
+        this.electricComponents.splice(index, 1);
+    }
+    getView(): HTMLElement {
+        if (this.view == null) this.view = document.createElement("div");
+        return this.view;
+    }
+    setView(view: HTMLElement) {
+        this.view = view;
+    }
+    addSubView(view: IView): void {
+        this.view.appendChild(view.getView());
+    }
+    removeSubView(view: IView) {
+        this.view.removeChild(view.getView());
+    }
+    private drawGrid(): void {
+        let grids = this.getView().getElementsByClassName("board-grid");
+        for (let i = 0; i < grids.length; i++) {
+            grids.item(i).remove();
         }
 
-    }
+        let width: number = this.getView().clientWidth;
+        let height: number = this.getView().clientHeight;
 
-    private drawGrid(container: HTMLElement): void {
-        if (!container) return;
-
-        let width: number = container.clientWidth;
-        let height: number = container.clientHeight;
-
+        this.getGridCellSize().set(Math.floor(width / this.getGridColumn()), Math.floor(height / this.getGridRow()));
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.style.width = `${width}px`;
-        svg.style.height = `${height}px`;
-        svg.style.left = "0";
-        svg.style.top = "0";
-        svg.style.position = "absolute";
         svg.style.backgroundColor = this.getBackgroundColor();
+        svg.classList.add("a1-container-absolute");
+        svg.classList.add("board-grid");
 
         for (let i = 0; i < this.gridRow; i++) {
             let line = <SVGLineElement>document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -111,53 +163,8 @@ class ElectricBoard implements IElectricBoard, IObjectBase {
             svg.appendChild(line);
         }
 
-        container.appendChild(svg);
+        this.getView().insertBefore(svg, this.getView().firstChild);
 
     }
 
-
-
-
-    //Override
-    public initialize(properties: object): void {
-        if (!properties) return;
-        if (ParamsKey._POWER_STATE_ in properties) { this.setPowerState(properties[ParamsKey._POWER_STATE_] == 1 ? ESwitch.ON : ESwitch.OFF); }
-        if (ParamsKey._DISPLAY_COMPONENT_NAME_ in properties) { this.setDisplayComponentNameState(properties[ParamsKey._DISPLAY_COMPONENT_NAME_] == 1 ? ESwitch.ON : ESwitch.OFF); }
-        if (ParamsKey._GRID_ROW_ in properties) { this.setGridRow(properties[ParamsKey._GRID_ROW_]); }
-        if (ParamsKey._GRID_COLUMN_ in properties) { this.setGridColumn(properties[ParamsKey._GRID_COLUMN_]); }
-        if (ParamsKey._BACKGROUND_COLOR_ in properties) { this.setBackgroundColor(properties[ParamsKey._BACKGROUND_COLOR_]); }
-        if (ParamsKey._ELECTRIC_COMPONENTS_ in properties) {
-            let componentDatas = properties[ParamsKey._ELECTRIC_COMPONENTS_];
-            if (componentDatas) {
-                for (let componentProperties of componentDatas) {
-                    let electricComponent: IElectricComponent = new CommonElectricComponent();
-                    electricComponent.initialize(componentProperties);
-                    this.addElectricComponent(electricComponent);
-                }
-            }
-        }
-    }
-
-    changeBackgroundColor(): void {
-
-        if (!this.boardElementID || this.boardElementID.length == 0) return;
-        let container = document.getElementById(this.boardElementID);
-        if (!container) return;
-
-        let svgEles = container.getElementsByTagName("svg");
-        if (svgEles && svgEles.length > 0) {
-            svgEles[0].style.backgroundColor = this.getBackgroundColor();
-        }
-    }
-
-    pluggedInNewComponent(electricComponent: IElectricComponent): void {
-        this.addElectricComponent(electricComponent);
-        if (!this.boardElementID || this.boardElementID.length == 0) return;
-
-        let container = document.getElementById(this.boardElementID);
-        if (!container) return;
-        electricComponent.render(this);
-        container.appendChild(electricComponent.getView());
-
-    }
 }
